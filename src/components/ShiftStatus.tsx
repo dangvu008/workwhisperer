@@ -123,14 +123,16 @@ export const ShiftStatus = () => {
             </AlertDialogContent>
           </AlertDialog>
           
-          <Button
-            variant="outline"
-            size="icon"
-            className="absolute -right-4 -top-4 rounded-full"
-            onClick={resetState}
-          >
-            <RefreshCw className="w-4 h-4" />
-          </Button>
+          {buttonState !== "idle" && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute -right-2 top-0 rounded-full w-8 h-8"
+              onClick={resetState}
+            >
+              <RefreshCw className="w-3 h-3" />
+            </Button>
+          )}
         </div>
         <div className="mt-4 space-y-2">
           {workStartTime && (
