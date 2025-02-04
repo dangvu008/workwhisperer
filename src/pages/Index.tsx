@@ -6,44 +6,46 @@ import { Settings, BarChart2 } from "lucide-react";
 
 const Index = () => {
   return (
-    // Main container with dark background
-    <div className="min-h-screen bg-[#0A0F1C] text-foreground p-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C] text-foreground p-4">
       <div className="max-w-md mx-auto">
-        {/* Header section with title and action buttons */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-semibold">Time Manager</h1>
-          <div className="flex gap-2">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Time Manager
+          </h1>
+          <div className="flex gap-3">
             <Button 
               variant="ghost" 
-              size="icon" 
-              className="text-muted-foreground hover:text-white"
+              size="icon"
+              className="text-muted-foreground hover:text-primary transition-colors duration-200"
             >
               <Settings className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="text-muted-foreground hover:text-white"
+              className="text-muted-foreground hover:text-primary transition-colors duration-200"
             >
               <BarChart2 className="w-5 h-5" />
             </Button>
           </div>
         </div>
         
-        {/* Main content components */}
-        <TimeDisplay />
-        <ShiftStatus />
-        <WeeklySchedule />
-        
-        {/* Notes section */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium">Ghi chú</h2>
-          <Button className="bg-blue-500 hover:bg-blue-600">
-            + Thêm ghi chú
-          </Button>
+        <div className="space-y-6">
+          <TimeDisplay />
+          <ShiftStatus />
+          <WeeklySchedule />
         </div>
-        <div className="text-center text-muted-foreground py-8">
-          Chưa có ghi chú nào
+        
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-medium">Ghi chú</h2>
+            <Button className="bg-primary hover:bg-primary/90 transition-colors duration-200">
+              + Thêm ghi chú
+            </Button>
+          </div>
+          <div className="text-center text-muted-foreground py-8 bg-card/50 rounded-lg">
+            Chưa có ghi chú nào
+          </div>
         </div>
       </div>
     </div>
