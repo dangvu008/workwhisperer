@@ -2,7 +2,7 @@ import { TimeDisplay } from "@/components/TimeDisplay";
 import { ShiftStatus } from "@/components/ShiftStatus";
 import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { Button } from "@/components/ui/button";
-import { Settings, BarChart2Plus } from "lucide-react";
+import { Settings, BarChart2 } from "lucide-react";
 
 const Index = () => {
   return (
@@ -15,7 +15,7 @@ const Index = () => {
               <Settings className="w-5 h-5" />
             </Button>
             <Button variant="ghost" size="icon" className="text-muted-foreground">
-              <BarChart2Plus className="w-5 h-5" />
+              <BarChart2 className="w-5 h-5" />
             </Button>
           </div>
         </div>
