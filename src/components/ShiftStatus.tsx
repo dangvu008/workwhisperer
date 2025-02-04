@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { CalendarDays, LogIn, LogOut, CheckCircle2, RotateCcw } from "lucide-react";
+import { CalendarDays, LogIn, LogOut, CheckCircle2, RotateCcw, RefreshCw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 type ButtonState = "idle" | "go_work" | "check_in" | "check_out";
 
@@ -11,6 +23,14 @@ export const ShiftStatus = () => {
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
 
+  const resetState = () => {
+    setButtonState("idle");
+    setWorkStartTime(null);
+    setCheckInTime(null);
+    setCheckOutTime(null);
+    toast.success("Đã đặt lại trạng thái");
+  };
+
   const getButtonConfig = (state: ButtonState) => {
     switch (state) {
       case "idle":
@@ -18,9 +38,11 @@ export const ShiftStatus = () => {
           text: "Đi làm",
           icon: <LogIn className="w-6 h-6" />,
           color: "bg-emerald-500 hover:bg-emerald-600",
+          confirmMessage: "Bạn có chắc chắn muốn bắt đầu ca làm việc?",
           action: () => {
             setWorkStartTime(new Date().toLocaleTimeString());
             setButtonState("go_work");
+            toast.success("Đã bắt đầu ca làm việc");
           }
         };
       case "go_work":
@@ -28,9 +50,11 @@ export const ShiftStatus = () => {
           text: "Chấm công vào",
           icon: <CheckCircle2 className="w-6 h-6" />,
           color: "bg-blue-500 hover:bg-blue-600",
+          confirmMessage: "Xác nhận chấm công vào?",
           action: () => {
             setCheckInTime(new Date().toLocaleTimeString());
             setButtonState("check_in");
+            toast.success("Đã chấm công vào");
           }
         };
       case "check_in":
@@ -38,9 +62,11 @@ export const ShiftStatus = () => {
           text: "Tan làm",
           icon: <LogOut className="w-6 h-6" />,
           color: "bg-violet-500 hover:bg-violet-600",
+          confirmMessage: "Xác nhận kết thúc ca làm việc?",
           action: () => {
             setCheckOutTime(new Date().toLocaleTimeString());
             setButtonState("check_out");
+            toast.success("Đã chấm công ra");
           }
         };
       case "check_out":
@@ -48,12 +74,10 @@ export const ShiftStatus = () => {
           text: "Ký công",
           icon: <RotateCcw className="w-6 h-6" />,
           color: "bg-gray-500 hover:bg-gray-600",
+          confirmMessage: "Xác nhận ký công và kết thúc ca làm việc?",
           action: () => {
-            // Reset all states for the next day
-            setButtonState("idle");
-            setWorkStartTime(null);
-            setCheckInTime(null);
-            setCheckOutTime(null);
+            resetState();
+            toast.success("Đã hoàn thành ca làm việc");
           }
         };
     }
@@ -73,13 +97,39 @@ export const ShiftStatus = () => {
             08:00 → 20:00
           </div>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center relative">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                className={`w-32 h-32 rounded-full ${currentConfig.color} text-white flex flex-col items-center justify-center gap-2 transition-colors duration-200`}
+              >
+                {currentConfig.icon}
+                <span className="text-lg font-medium">{currentConfig.text}</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Xác nhận thao tác</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {currentConfig.confirmMessage}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction onClick={currentConfig.action}>
+                  Xác nhận
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          
           <Button
-            className={`w-32 h-32 rounded-full ${currentConfig.color} text-white flex flex-col items-center justify-center gap-2 transition-colors duration-200`}
-            onClick={currentConfig.action}
+            variant="outline"
+            size="icon"
+            className="absolute -right-4 -top-4 rounded-full"
+            onClick={resetState}
           >
-            {currentConfig.icon}
-            <span className="text-lg font-medium">{currentConfig.text}</span>
+            <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
         <div className="mt-4 space-y-2">
