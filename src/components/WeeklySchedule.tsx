@@ -9,7 +9,7 @@ import {
   Bed,
   Flag,
   XCircle,
-  QuestionMarkCircle
+  HelpCircle
 } from "lucide-react";
 import {
   Tooltip,
@@ -67,7 +67,7 @@ export const WeeklySchedule = () => {
       case "absent":
         return <XCircle {...iconProps} className="text-red-500" />;
       default:
-        return <QuestionMarkCircle {...iconProps} className="text-gray-400" />;
+        return <HelpCircle {...iconProps} className="text-gray-400" />;
     }
   };
 
