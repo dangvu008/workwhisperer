@@ -17,6 +17,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { useState } from "react";
 
 type AttendanceStatus = 
   | "warning" // Đi làm nhưng thiếu chấm công
@@ -38,12 +45,12 @@ export const WeeklySchedule = () => {
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
 
-  // Mock data - replace with real data in production
-  const mockStatuses: Record<string, DayStatus> = {
+  // Mock data with state management
+  const [statuses, setStatuses] = useState<Record<string, DayStatus>>({
     "2024-03-18": { status: "complete", checkIn: "08:00", checkOut: "17:00" },
     "2024-03-19": { status: "warning", checkIn: "08:30", checkOut: "--:--" },
     "2024-03-20": { status: "leave", reason: "Nghỉ phép năm" },
-  };
+  });
 
   const getStatusIcon = (status: AttendanceStatus) => {
     const iconProps = {
@@ -84,30 +91,68 @@ export const WeeklySchedule = () => {
     return details || "Không có thông tin chi tiết";
   };
 
+  const updateStatus = (dateStr: string, newStatus: AttendanceStatus) => {
+    setStatuses(prev => ({
+      ...prev,
+      [dateStr]: { 
+        ...prev[dateStr],
+        status: newStatus,
+      }
+    }));
+  };
+
+  const statusLabels: Record<AttendanceStatus, string> = {
+    warning: "Thiếu chấm công",
+    complete: "Đủ công",
+    pending: "Chưa cập nhật",
+    leave: "Nghỉ phép",
+    sick: "Nghỉ bệnh",
+    holiday: "Nghỉ lễ",
+    absent: "Vắng không lý do"
+  };
+
   return (
     <Card className="bg-[#1A1F2C]/50 border-[#2A2F3C] p-4 mb-6">
       <h2 className="text-lg font-medium mb-4">Trạng thái tuần này</h2>
       <div className="grid grid-cols-7 gap-2">
         {weekDays.map((date, i) => {
           const dateStr = format(date, "yyyy-MM-dd");
-          const dayStatus = mockStatuses[dateStr];
+          const dayStatus = statuses[dateStr];
           const isPastOrToday = isBefore(date, new Date()) || isToday(date);
           const status = isPastOrToday ? (dayStatus?.status || "pending") : "pending";
 
           return (
             <TooltipProvider key={i}>
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="text-center cursor-pointer">
-                    <div className="text-sm text-muted-foreground mb-1 uppercase">
-                      {format(date, "EEE", { locale: vi })}
-                    </div>
-                    <div className="text-sm">{format(date, "dd")}</div>
-                    <div className="mt-2 flex justify-center">
-                      {getStatusIcon(status)}
-                    </div>
-                  </div>
-                </TooltipTrigger>
+                <ContextMenu>
+                  <ContextMenuTrigger disabled={!isPastOrToday} asChild>
+                    <TooltipTrigger asChild>
+                      <div className="text-center cursor-pointer">
+                        <div className="text-sm text-muted-foreground mb-1 uppercase">
+                          {format(date, "EEE", { locale: vi })}
+                        </div>
+                        <div className="text-sm">{format(date, "dd")}</div>
+                        <div className="mt-2 flex justify-center">
+                          {getStatusIcon(status)}
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                  </ContextMenuTrigger>
+                  {isPastOrToday && (
+                    <ContextMenuContent className="w-48">
+                      {Object.entries(statusLabels).map(([key, label]) => (
+                        <ContextMenuItem
+                          key={key}
+                          onClick={() => updateStatus(dateStr, key as AttendanceStatus)}
+                          className="flex items-center gap-2"
+                        >
+                          {getStatusIcon(key as AttendanceStatus)}
+                          <span>{label}</span>
+                        </ContextMenuItem>
+                      ))}
+                    </ContextMenuContent>
+                  )}
+                </ContextMenu>
                 <TooltipContent>
                   <p className="whitespace-pre-line">
                     {getStatusDetails(date, dayStatus)}
