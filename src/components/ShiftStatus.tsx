@@ -130,7 +130,7 @@ export const ShiftStatus = () => {
               className="absolute -right-2 top-0 rounded-full w-8 h-8"
               onClick={resetState}
             >
-              <RefreshCw className="w-3 h-3" />
+              <RefreshCw className="w-3 h-3 text-muted-foreground hover:text-primary transition-colors duration-200" />
             </Button>
           )}
         </div>
