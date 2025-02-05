@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -124,14 +125,31 @@ export const ShiftStatus = () => {
           </AlertDialog>
           
           {buttonState !== "idle" && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute -right-2 top-0 rounded-full w-8 h-8"
-              onClick={resetState}
-            >
-              <RefreshCw className="w-3 h-3 text-muted-foreground hover:text-primary transition-colors duration-200" />
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute -right-2 top-0 rounded-full w-8 h-8"
+                >
+                  <RefreshCw className="w-3 h-3 text-muted-foreground hover:text-primary transition-colors duration-200" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Xác nhận đặt lại</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Bạn có chắc chắn muốn đặt lại trạng thái? Hành động này không thể hoàn tác.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Hủy</AlertDialogCancel>
+                  <AlertDialogAction onClick={resetState}>
+                    Xác nhận
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
         <div className="mt-4 space-y-2">
