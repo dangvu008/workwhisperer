@@ -97,7 +97,7 @@ export const ShiftStatus = () => {
             08:00 → 20:00
           </div>
         </div>
-        <div className="flex justify-center relative">
+        <div className="flex justify-center relative max-w-[200px] mx-auto">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
