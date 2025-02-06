@@ -27,13 +27,13 @@ import {
 import { useState } from "react";
 
 type AttendanceStatus = 
-  | "warning" // Đi làm nhưng thiếu chấm công
-  | "complete" // Đủ công
-  | "pending" // Chưa cập nhật
-  | "leave" // Nghỉ phép
-  | "sick" // Nghỉ bệnh
-  | "holiday" // Nghỉ lễ
-  | "absent"; // Vắng không lý do
+  | "warning" 
+  | "complete" 
+  | "pending" 
+  | "leave" 
+  | "sick" 
+  | "holiday" 
+  | "absent";
 
 interface DayStatus {
   status: AttendanceStatus;
@@ -41,6 +41,16 @@ interface DayStatus {
   checkOut?: string;
   reason?: string;
 }
+
+const vietnameseWeekdays: Record<string, string> = {
+  'Mon': 'T2',
+  'Tue': 'T3',
+  'Wed': 'T4',
+  'Thu': 'T5',
+  'Fri': 'T6',
+  'Sat': 'T7',
+  'Sun': 'CN'
+};
 
 export const WeeklySchedule = () => {
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -121,6 +131,8 @@ export const WeeklySchedule = () => {
           const dayStatus = statuses[dateStr];
           const isPastOrToday = isBefore(date, new Date()) || isToday(date);
           const status = isPastOrToday ? (dayStatus?.status || "pending") : "pending";
+          const weekdayEn = format(date, "EEE");
+          const weekdayVi = vietnameseWeekdays[weekdayEn];
 
           return (
             <TooltipProvider key={i}>
@@ -130,7 +142,7 @@ export const WeeklySchedule = () => {
                     <TooltipTrigger asChild>
                       <div className="text-center cursor-pointer">
                         <div className="text-sm text-muted-foreground mb-1 uppercase">
-                          {format(date, "EEE", { locale: vi })}
+                          {weekdayVi}
                         </div>
                         <div className="text-sm">{format(date, "dd")}</div>
                         <div className="mt-2 flex justify-center">
