@@ -1,6 +1,8 @@
+
 import { TimeDisplay } from "@/components/TimeDisplay";
 import { ShiftStatus } from "@/components/ShiftStatus";
 import { WeeklySchedule } from "@/components/WeeklySchedule";
+import { NoteSection } from "@/components/NoteSection";
 import { Button } from "@/components/ui/button";
 import { Settings, BarChart2 } from "lucide-react";
 
@@ -34,18 +36,7 @@ const Index = () => {
           <TimeDisplay />
           <ShiftStatus />
           <WeeklySchedule />
-        </div>
-        
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium">Ghi chú</h2>
-            <Button className="bg-primary hover:bg-primary/90 transition-colors duration-200">
-              + Thêm ghi chú
-            </Button>
-          </div>
-          <div className="text-center text-muted-foreground py-8 bg-card/50 rounded-lg">
-            Chưa có ghi chú nào
-          </div>
+          <NoteSection />
         </div>
       </div>
     </div>
