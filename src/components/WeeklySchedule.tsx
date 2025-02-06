@@ -1,16 +1,13 @@
-
 import { format, startOfWeek, addDays, isBefore, isToday } from "date-fns";
-import { vi } from "date-fns/locale";
 import { Card } from "./ui/card";
 import { 
   AlertCircle, 
   CheckCircle, 
-  MinusCircle,
+  HelpCircle,
   FileText,
   Bed,
   Flag,
-  XCircle,
-  HelpCircle
+  XCircle
 } from "lucide-react";
 import {
   Tooltip,
@@ -27,13 +24,13 @@ import {
 import { useState } from "react";
 
 type AttendanceStatus = 
-  | "warning" 
-  | "complete" 
-  | "pending" 
-  | "leave" 
-  | "sick" 
-  | "holiday" 
-  | "absent";
+  | "warning"  // ❗ Đi làm nhưng thiếu chấm công
+  | "complete" // ✅ Đủ công
+  | "pending"  // ❓ Chưa cập nhật
+  | "leave"    // 📩 Nghỉ phép
+  | "sick"     // 🛌 Nghỉ bệnh
+  | "holiday"  // 🎌 Nghỉ lễ
+  | "absent";  // ❌ Vắng không lý do
 
 interface DayStatus {
   status: AttendanceStatus;
@@ -75,7 +72,7 @@ export const WeeklySchedule = () => {
       case "complete":
         return <CheckCircle {...iconProps} className="text-green-500" />;
       case "pending":
-        return <MinusCircle {...iconProps} className="text-gray-400" />;
+        return <HelpCircle {...iconProps} className="text-gray-400" />;
       case "leave":
         return <FileText {...iconProps} className="text-blue-500" />;
       case "sick":
@@ -93,13 +90,37 @@ export const WeeklySchedule = () => {
     if (!status) return "Chưa có dữ liệu";
     
     let details = "";
+    switch (status.status) {
+      case "warning":
+        details = "Thiếu chấm công";
+        break;
+      case "complete":
+        details = "Đủ công";
+        break;
+      case "pending":
+        details = "Chưa cập nhật";
+        break;
+      case "leave":
+        details = "Nghỉ phép";
+        break;
+      case "sick":
+        details = "Nghỉ bệnh";
+        break;
+      case "holiday":
+        details = "Nghỉ lễ";
+        break;
+      case "absent":
+        details = "Vắng không lý do";
+        break;
+    }
+    
     if (status.checkIn && status.checkOut) {
-      details += `${status.checkIn} - ${status.checkOut}`;
+      details += `\nGiờ vào: ${status.checkIn}\nGiờ ra: ${status.checkOut}`;
     }
     if (status.reason) {
-      details += details ? `\n${status.reason}` : status.reason;
+      details += `\nLý do: ${status.reason}`;
     }
-    return details || "Không có thông tin chi tiết";
+    return details;
   };
 
   const updateStatus = (dateStr: string, newStatus: AttendanceStatus) => {
@@ -141,7 +162,7 @@ export const WeeklySchedule = () => {
                   <ContextMenuTrigger disabled={!isPastOrToday} asChild>
                     <TooltipTrigger asChild>
                       <div className="text-center cursor-pointer">
-                        <div className="text-sm text-muted-foreground mb-1 uppercase">
+                        <div className="text-sm text-muted-foreground mb-1">
                           {weekdayVi}
                         </div>
                         <div className="text-sm">{format(date, "dd")}</div>
