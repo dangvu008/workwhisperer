@@ -80,7 +80,9 @@ export const NoteSection = () => {
     } else {
       const newNote: Note = {
         id: Date.now().toString(),
-        ...data,
+        title: data.title,
+        content: data.content,
+        reminderTime: data.reminderTime,
       };
       setNotes([newNote, ...notes].slice(0, 3));
       toast.success("Đã thêm ghi chú mới");
