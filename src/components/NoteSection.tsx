@@ -73,7 +73,12 @@ export const NoteSection = () => {
     if (editingNote) {
       setNotes(notes.map(note => 
         note.id === editingNote.id 
-          ? { ...note, ...data }
+          ? {
+              id: note.id,
+              title: data.title,
+              content: data.content,
+              reminderTime: data.reminderTime,
+            }
           : note
       ));
       toast.success("Đã cập nhật ghi chú");
