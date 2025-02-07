@@ -5,8 +5,11 @@ import { WeeklySchedule } from "@/components/WeeklySchedule";
 import { NoteSection } from "@/components/NoteSection";
 import { Button } from "@/components/ui/button";
 import { Settings, BarChart2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C] text-foreground p-4">
       <div className="max-w-md mx-auto">
@@ -19,6 +22,7 @@ const Index = () => {
               variant="ghost" 
               size="icon"
               className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              onClick={() => navigate("/settings")}
             >
               <Settings className="w-5 h-5" />
             </Button>
