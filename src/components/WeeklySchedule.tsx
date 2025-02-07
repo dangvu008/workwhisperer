@@ -54,11 +54,12 @@ export const WeeklySchedule = () => {
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
 
-  // Mock data with state management
+  // Updated mock data with more realistic scenarios
   const [statuses, setStatuses] = useState<Record<string, DayStatus>>({
-    "2024-03-18": { status: "complete", checkIn: "08:00", checkOut: "17:00" },
-    "2024-03-19": { status: "warning", checkIn: "08:30", checkOut: "--:--" },
+    "2024-03-18": { status: "complete", checkIn: "08:00", checkOut: "17:30" },
+    "2024-03-19": { status: "warning", checkIn: "08:30" },
     "2024-03-20": { status: "leave", reason: "Nghỉ phép năm" },
+    "2024-03-21": { status: "sick", reason: "Nghỉ ốm có đơn" },
   });
 
   const getStatusIcon = (status: AttendanceStatus) => {
@@ -87,59 +88,46 @@ export const WeeklySchedule = () => {
     }
   };
 
-  const getStatusText = (status: AttendanceStatus) => {
-    switch (status) {
-      case "warning":
-        return "❗ Thiếu chấm công";
-      case "complete":
-        return "✅ Đủ công";
-      case "pending":
-        return "❓ Chưa cập nhật";
-      case "leave":
-        return "📩 Nghỉ phép";
-      case "sick":
-        return "🛌 Nghỉ bệnh";
-      case "holiday":
-        return "🎌 Nghỉ lễ";
-      case "absent":
-        return "❌ Vắng không lý do";
-      default:
-        return "❓ Chưa cập nhật";
-    }
+  const getStatusText = (status: AttendanceStatus): string => {
+    const statusEmojis: Record<AttendanceStatus, string> = {
+      warning: "❗ Thiếu chấm công",
+      complete: "✅ Đủ công",
+      pending: "❓ Chưa cập nhật",
+      leave: "📩 Nghỉ phép",
+      sick: "🛌 Nghỉ bệnh",
+      holiday: "🎌 Nghỉ lễ",
+      absent: "❌ Vắng không lý do"
+    };
+    return statusEmojis[status] || statusEmojis.pending;
   };
 
-  const getStatusDetails = (date: Date, status?: DayStatus) => {
+  const getStatusDetails = (date: Date, status?: DayStatus): string => {
     if (!status) return "Chưa có dữ liệu";
     
     let details = getStatusText(status.status);
     
-    if (status.checkIn && status.checkOut) {
-      details += `\nGiờ vào: ${status.checkIn}\nGiờ ra: ${status.checkOut}`;
+    if (status.checkIn || status.checkOut) {
+      details += "\n";
+      if (status.checkIn) details += `Giờ vào: ${status.checkIn}\n`;
+      if (status.checkOut) details += `Giờ ra: ${status.checkOut}`;
     }
     if (status.reason) {
       details += `\nLý do: ${status.reason}`;
     }
-    return details;
+    return details.trim();
   };
 
   const updateStatus = (dateStr: string, newStatus: AttendanceStatus) => {
-    setStatuses(prev => ({
-      ...prev,
-      [dateStr]: { 
-        ...prev[dateStr],
-        status: newStatus,
-      }
-    }));
-  };
-
-  const statusLabels: Record<AttendanceStatus, string> = {
-    warning: "❗ Thiếu chấm công",
-    complete: "✅ Đủ công",
-    pending: "❓ Chưa cập nhật",
-    leave: "📩 Nghỉ phép",
-    sick: "🛌 Nghỉ bệnh",
-    holiday: "🎌 Nghỉ lễ",
-    absent: "❌ Vắng không lý do"
+    setStatuses(prev => {
+      const currentStatus = prev[dateStr] || {};
+      return {
+        ...prev,
+        [dateStr]: { 
+          ...currentStatus,
+          status: newStatus,
+        }
+      };
+    });
   };
 
   return (
@@ -160,11 +148,11 @@ export const WeeklySchedule = () => {
                 <ContextMenu>
                   <ContextMenuTrigger disabled={!isPastOrToday} asChild>
                     <TooltipTrigger asChild>
-                      <div className="text-center cursor-pointer">
+                      <div className={`text-center p-2 rounded-md transition-colors duration-200 ${isPastOrToday ? 'cursor-pointer hover:bg-[#2A2F3C]' : 'cursor-default'}`}>
                         <div className="text-sm text-muted-foreground mb-1">
                           {weekdayVi}
                         </div>
-                        <div className="text-sm">{format(date, "dd")}</div>
+                        <div className="text-sm font-medium">{format(date, "dd")}</div>
                         <div className="mt-2 flex justify-center">
                           {getStatusIcon(status)}
                         </div>
@@ -173,14 +161,14 @@ export const WeeklySchedule = () => {
                   </ContextMenuTrigger>
                   {isPastOrToday && (
                     <ContextMenuContent className="w-48">
-                      {Object.entries(statusLabels).map(([key, label]) => (
+                      {Object.keys(getStatusText({} as AttendanceStatus)).map((key) => (
                         <ContextMenuItem
                           key={key}
                           onClick={() => updateStatus(dateStr, key as AttendanceStatus)}
                           className="flex items-center gap-2"
                         >
                           {getStatusIcon(key as AttendanceStatus)}
-                          <span>{label}</span>
+                          <span>{getStatusText(key as AttendanceStatus)}</span>
                         </ContextMenuItem>
                       ))}
                     </ContextMenuContent>
