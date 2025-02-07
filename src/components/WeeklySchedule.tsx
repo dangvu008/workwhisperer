@@ -1,3 +1,4 @@
+
 import { format, startOfWeek, addDays, isBefore, isToday } from "date-fns";
 import { Card } from "./ui/card";
 import { 
@@ -86,33 +87,31 @@ export const WeeklySchedule = () => {
     }
   };
 
+  const getStatusText = (status: AttendanceStatus) => {
+    switch (status) {
+      case "warning":
+        return "❗ Thiếu chấm công";
+      case "complete":
+        return "✅ Đủ công";
+      case "pending":
+        return "❓ Chưa cập nhật";
+      case "leave":
+        return "📩 Nghỉ phép";
+      case "sick":
+        return "🛌 Nghỉ bệnh";
+      case "holiday":
+        return "🎌 Nghỉ lễ";
+      case "absent":
+        return "❌ Vắng không lý do";
+      default:
+        return "❓ Chưa cập nhật";
+    }
+  };
+
   const getStatusDetails = (date: Date, status?: DayStatus) => {
     if (!status) return "Chưa có dữ liệu";
     
-    let details = "";
-    switch (status.status) {
-      case "warning":
-        details = "Thiếu chấm công";
-        break;
-      case "complete":
-        details = "Đủ công";
-        break;
-      case "pending":
-        details = "Chưa cập nhật";
-        break;
-      case "leave":
-        details = "Nghỉ phép";
-        break;
-      case "sick":
-        details = "Nghỉ bệnh";
-        break;
-      case "holiday":
-        details = "Nghỉ lễ";
-        break;
-      case "absent":
-        details = "Vắng không lý do";
-        break;
-    }
+    let details = getStatusText(status.status);
     
     if (status.checkIn && status.checkOut) {
       details += `\nGiờ vào: ${status.checkIn}\nGiờ ra: ${status.checkOut}`;
@@ -134,13 +133,13 @@ export const WeeklySchedule = () => {
   };
 
   const statusLabels: Record<AttendanceStatus, string> = {
-    warning: "Thiếu chấm công",
-    complete: "Đủ công",
-    pending: "Chưa cập nhật",
-    leave: "Nghỉ phép",
-    sick: "Nghỉ bệnh",
-    holiday: "Nghỉ lễ",
-    absent: "Vắng không lý do"
+    warning: "❗ Thiếu chấm công",
+    complete: "✅ Đủ công",
+    pending: "❓ Chưa cập nhật",
+    leave: "📩 Nghỉ phép",
+    sick: "🛌 Nghỉ bệnh",
+    holiday: "🎌 Nghỉ lễ",
+    absent: "❌ Vắng không lý do"
   };
 
   return (
