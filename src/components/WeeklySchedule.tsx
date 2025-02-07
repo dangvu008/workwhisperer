@@ -28,7 +28,7 @@ type AttendanceStatus =
   | "warning"  // ❗ Đi làm nhưng thiếu chấm công
   | "complete" // ✅ Đủ công
   | "pending"  // ❓ Chưa cập nhật
-  | "leave"    // 📩 Nghỉ phép
+  | "leave"    // 📩 Nghỉ phép 
   | "sick"     // 🛌 Nghỉ bệnh
   | "holiday"  // 🎌 Nghỉ lễ
   | "absent";  // ❌ Vắng không lý do
@@ -54,7 +54,7 @@ export const WeeklySchedule = () => {
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
 
-  // Updated mock data with more realistic scenarios
+  // Mock data with more realistic scenarios
   const [statuses, setStatuses] = useState<Record<string, DayStatus>>({
     "2024-03-18": { status: "complete", checkIn: "08:00", checkOut: "17:30" },
     "2024-03-19": { status: "warning", checkIn: "08:30" },
@@ -187,3 +187,4 @@ export const WeeklySchedule = () => {
     </Card>
   );
 };
+
