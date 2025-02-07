@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from "react";
-import { Bell, Moon, Sun, User, Clock } from "lucide-react";
+import { Bell, Moon, Sun, User, Clock, ChevronDown, Plus, ArrowLeft, Pencil, Trash2, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 interface WorkShift {
   id: string;
@@ -24,7 +24,6 @@ interface WorkShift {
 
 const Settings = () => {
   const { toast } = useToast();
-  const [name, setName] = useState("Nguyễn Văn A");
   const [language, setLanguage] = useState("vi");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
@@ -32,65 +31,27 @@ const Settings = () => {
   const [workShifts, setWorkShifts] = useState<WorkShift[]>([
     {
       id: "1",
-      name: "Ca sáng",
+      name: "Ca Ngay",
       startTime: "08:00",
-      endTime: "17:00",
+      endTime: "20:00",
       isActive: true,
-    },
-    {
-      id: "2",
-      name: "Ca chiều",
-      startTime: "13:00",
-      endTime: "22:00",
-      isActive: false,
-    },
+    }
   ]);
 
-  // Initialize dark mode from localStorage or system preference
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("darkMode");
     if (savedDarkMode !== null) {
       setIsDarkMode(savedDarkMode === "true");
       document.documentElement.classList.toggle("dark", savedDarkMode === "true");
-    } else {
-      const systemDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDarkMode(systemDarkMode);
-      document.documentElement.classList.toggle("dark", systemDarkMode);
     }
   }, []);
 
-  // Initialize language from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language");
     if (savedLanguage) {
       setLanguage(savedLanguage);
     }
   }, []);
-
-  const handleUpdatePersonalInfo = () => {
-    localStorage.setItem("language", language);
-    toast({
-      title: language === "vi" ? "Thành công" : "Success",
-      description: language === "vi" 
-        ? "Thông tin cá nhân đã được cập nhật" 
-        : "Personal information has been updated",
-    });
-  };
-
-  const handleToggleShift = (shiftId: string) => {
-    setWorkShifts(shifts =>
-      shifts.map(shift => ({
-        ...shift,
-        isActive: shift.id === shiftId,
-      }))
-    );
-    toast({
-      title: language === "vi" ? "Thành công" : "Success",
-      description: language === "vi" 
-        ? "Đã cập nhật ca làm việc"
-        : "Work shift has been updated",
-    });
-  };
 
   const handleDarkModeToggle = (enabled: boolean) => {
     setIsDarkMode(enabled);
@@ -99,75 +60,115 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C] text-foreground p-4">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <h1 className="text-2xl font-bold text-center mb-8">
-          {language === "vi" ? "Cài đặt" : "Settings"}
-        </h1>
+    <div className="min-h-screen bg-[#0A0F1C] text-white">
+      <div className="max-w-2xl mx-auto p-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-bold">Settings</h1>
+          <Link to="/" className="text-gray-400 hover:text-white">
+            <ArrowLeft className="h-6 w-6" />
+          </Link>
+        </div>
 
         {/* Work Shifts Section */}
-        <div className="bg-black/20 p-6 rounded-lg space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="h-5 w-5" />
-            <h2 className="text-xl font-semibold">
-              {language === "vi" ? "Quản lý ca làm việc" : "Work Shift Management"}
-            </h2>
+        <div className="bg-[#1A1F2C] rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-semibold mb-1">Ca làm việc</h2>
+              <p className="text-sm text-gray-400">Quản lý ca làm việc</p>
+            </div>
+            <Button variant="outline" size="icon" className="bg-[#2A2F3C] border-[#3A3F4C] hover:bg-[#3A3F4C]">
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
+
           <div className="space-y-4">
+            <div className="flex items-center justify-between text-sm text-gray-400">
+              <span>Nhắc nhở thay đổi ca</span>
+              <Select defaultValue="none">
+                <SelectTrigger className="w-[180px] bg-[#2A2F3C] border-[#3A3F4C]">
+                  <SelectValue placeholder="Không nhắc nhở" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Không nhắc nhở</SelectItem>
+                  <SelectItem value="15">15 phút trước</SelectItem>
+                  <SelectItem value="30">30 phút trước</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {workShifts.map((shift) => (
               <div
                 key={shift.id}
-                className={`flex items-center justify-between p-4 rounded-lg ${
-                  shift.isActive
-                    ? "bg-primary/10 border border-primary/30"
-                    : "bg-black/20"
-                }`}
+                className="flex items-center justify-between p-4 bg-[#111827] rounded-lg"
               >
                 <div>
                   <h3 className="font-medium">{shift.name}</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-blue-400">
                     {shift.startTime} - {shift.endTime}
                   </p>
+                  {shift.isActive && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      Đang áp dụng cho tuần này
+                    </p>
+                  )}
                 </div>
-                <Button
-                  variant={shift.isActive ? "default" : "secondary"}
-                  onClick={() => handleToggleShift(shift.id)}
-                >
-                  {shift.isActive 
-                    ? (language === "vi" ? "Đang áp dụng" : "Applied")
-                    : (language === "vi" ? "Áp dụng" : "Apply")}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="text-gray-400 hover:text-gray-300 hover:bg-gray-400/10"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Personal Information Section */}
-        <div className="bg-black/20 p-6 rounded-lg space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <User className="h-5 w-5" />
-            <h2 className="text-xl font-semibold">
-              {language === "vi" ? "Thông tin cá nhân" : "Personal Information"}
-            </h2>
-          </div>
-          <div className="space-y-4">
+        {/* General Settings Section */}
+        <div className="bg-[#1A1F2C] rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-6">Cài đặt chung</h2>
+          
+          <div className="space-y-6">
+            {/* Dark Mode */}
             <div className="space-y-2">
-              <Label htmlFor="name">
-                {language === "vi" ? "Họ và tên" : "Full Name"}
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-base font-medium">Chế độ tối</Label>
+                  <p className="text-sm text-gray-400">
+                    Bật chế độ tối để có trải nghiệm xem tốt hơn trong điều kiện ánh sáng yếu
+                  </p>
+                </div>
+                <Switch
+                  checked={isDarkMode}
+                  onCheckedChange={handleDarkModeToggle}
+                  className="data-[state=checked]:bg-blue-500"
+                />
+              </div>
             </div>
+
+            {/* Language */}
             <div className="space-y-2">
-              <Label htmlFor="language">
-                {language === "vi" ? "Ngôn ngữ" : "Language"}
-              </Label>
+              <Label className="text-base font-medium">Ngôn ngữ</Label>
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger>
-                  <SelectValue />
+                <SelectTrigger className="w-full bg-[#2A2F3C] border-[#3A3F4C]">
+                  <SelectValue placeholder="Chọn ngôn ngữ" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="vi">Tiếng Việt</SelectItem>
@@ -175,65 +176,36 @@ const Settings = () => {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={handleUpdatePersonalInfo}>
-              {language === "vi" ? "Cập nhật" : "Update"}
-            </Button>
-          </div>
-        </div>
 
-        {/* Notifications Section */}
-        <div className="bg-black/20 p-6 rounded-lg space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Bell className="h-5 w-5" />
-            <h2 className="text-xl font-semibold">
-              {language === "vi" ? "Thông báo" : "Notifications"}
-            </h2>
-          </div>
-          <div className="space-y-4">
+            {/* Notification Sound */}
             <div className="flex items-center justify-between">
-              <Label htmlFor="sound">
-                {language === "vi" ? "Âm thanh" : "Sound"}
-              </Label>
+              <div>
+                <Label className="text-base font-medium">Âm thanh thông báo</Label>
+                <p className="text-sm text-gray-400">
+                  Phát âm thanh khi có thông báo
+                </p>
+              </div>
               <Switch
-                id="sound"
                 checked={soundEnabled}
                 onCheckedChange={setSoundEnabled}
+                className="data-[state=checked]:bg-blue-500"
               />
             </div>
+
+            {/* Vibration */}
             <div className="flex items-center justify-between">
-              <Label htmlFor="vibration">
-                {language === "vi" ? "Rung" : "Vibration"}
-              </Label>
+              <div>
+                <Label className="text-base font-medium">Rung thông báo</Label>
+                <p className="text-sm text-gray-400">
+                  Rung khi có thông báo
+                </p>
+              </div>
               <Switch
-                id="vibration"
                 checked={vibrationEnabled}
                 onCheckedChange={setVibrationEnabled}
+                className="data-[state=checked]:bg-blue-500"
               />
             </div>
-          </div>
-        </div>
-
-        {/* Theme Section */}
-        <div className="bg-black/20 p-6 rounded-lg space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            {isDarkMode ? (
-              <Moon className="h-5 w-5" />
-            ) : (
-              <Sun className="h-5 w-5" />
-            )}
-            <h2 className="text-xl font-semibold">
-              {language === "vi" ? "Giao diện" : "Theme"}
-            </h2>
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="theme">
-              {language === "vi" ? "Chế độ tối" : "Dark Mode"}
-            </Label>
-            <Switch
-              id="theme"
-              checked={isDarkMode}
-              onCheckedChange={handleDarkModeToggle}
-            />
           </div>
         </div>
       </div>
