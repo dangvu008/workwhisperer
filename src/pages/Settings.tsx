@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Bell, Moon, Sun, User, Clock, ChevronDown, Plus, ArrowLeft, Pencil, Trash2, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
+import { WorkShiftForm } from "@/components/WorkShiftForm";
 
 interface WorkShift {
   id: string;
@@ -19,6 +21,9 @@ interface WorkShift {
   startTime: string;
   endTime: string;
   isActive: boolean;
+  reminderBefore?: string;
+  reminderAfter?: string;
+  showCheckInButton?: boolean;
 }
 
 const Settings = () => {
@@ -27,6 +32,8 @@ const Settings = () => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showWorkShiftForm, setShowWorkShiftForm] = useState(false);
+  const [editingShift, setEditingShift] = useState<WorkShift | null>(null);
   const [workShifts, setWorkShifts] = useState<WorkShift[]>([
     {
       id: "1",
@@ -94,6 +101,37 @@ const Settings = () => {
   const handleVibrationToggle = (enabled: boolean) => {
     setVibrationEnabled(enabled);
     localStorage.setItem("vibrationEnabled", enabled.toString());
+  };
+
+  const handleSaveWorkShift = (workShiftData: Omit<WorkShift, 'id' | 'isActive'>) => {
+    if (editingShift) {
+      // Update existing shift
+      setWorkShifts(workShifts.map(shift => 
+        shift.id === editingShift.id ? { ...workShiftData, id: shift.id, isActive: shift.isActive } : shift
+      ));
+      toast({
+        title: "Cập nhật ca làm việc thành công",
+        duration: 2000,
+      });
+    } else {
+      // Add new shift
+      setWorkShifts([...workShifts, { 
+        ...workShiftData, 
+        id: Date.now().toString(), 
+        isActive: false 
+      }]);
+      toast({
+        title: "Thêm ca làm việc mới thành công",
+        duration: 2000,
+      });
+    }
+    setShowWorkShiftForm(false);
+    setEditingShift(null);
+  };
+
+  const handleEditShift = (shift: WorkShift) => {
+    setEditingShift(shift);
+    setShowWorkShiftForm(true);
   };
 
   return (
@@ -170,6 +208,12 @@ const Settings = () => {
                     variant="ghost" 
                     size="icon"
                     className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
+                    onClick={() => {
+                      setWorkShifts(workShifts.map(s => ({
+                        ...s,
+                        isActive: s.id === shift.id
+                      })));
+                    }}
                   >
                     <Check className="h-4 w-4" />
                   </Button>
@@ -177,6 +221,7 @@ const Settings = () => {
                     variant="ghost" 
                     size="icon"
                     className="text-gray-400 hover:text-gray-300 hover:bg-gray-400/10"
+                    onClick={() => handleEditShift(shift)}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -184,6 +229,13 @@ const Settings = () => {
                     variant="ghost" 
                     size="icon"
                     className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                    onClick={() => {
+                      setWorkShifts(workShifts.filter(s => s.id !== shift.id));
+                      toast({
+                        title: "Đã xóa ca làm việc",
+                        duration: 2000,
+                      });
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -277,36 +329,19 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      <WorkShiftForm
+        isOpen={showWorkShiftForm}
+        onClose={() => {
+          setShowWorkShiftForm(false);
+          setEditingShift(null);
+        }}
+        onSave={handleSaveWorkShift}
+        editingShift={editingShift}
+      />
     </div>
   );
 };
 
-import { WorkShiftForm } from "@/components/WorkShiftForm";
-
-// Add this to the existing state declarations
-const [showWorkShiftForm, setShowWorkShiftForm] = useState(false);
-const [editingShift, setEditingShift] = useState<WorkShift | null>(null);
-
-// Add these functions before the return statement
-const handleSaveWorkShift = (workShiftData: any) => {
-  if (editingShift) {
-    // Update existing shift
-    setWorkShifts(workShifts.map(shift => 
-      shift.id === editingShift.id ? { ...workShiftData, id: shift.id } : shift
-    ));
-  } else {
-    // Add new shift
-    setWorkShifts([...workShifts, { id: Date.now().toString(), ...workShiftData, isActive: false }]);
-  }
-  setShowWorkShiftForm(false);
-  setEditingShift(null);
-};
-
-const handleEditShift = (shift: WorkShift) => {
-  setEditingShift(shift);
-  setShowWorkShiftForm(true);
-};
-
-// Add this before the closing return statement
 Settings.displayName = "Settings";
 export default Settings;
