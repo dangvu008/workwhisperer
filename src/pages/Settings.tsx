@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { Bell, Moon, Sun, User, Clock, ChevronDown, Plus, ArrowLeft, Pencil, Trash2, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -28,13 +28,13 @@ interface WorkShift {
 
 const Settings = () => {
   const { toast } = useToast();
-  const [language, setLanguage] = useState("vi");
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showWorkShiftForm, setShowWorkShiftForm] = useState(false);
-  const [editingShift, setEditingShift] = useState<WorkShift | null>(null);
-  const [workShifts, setWorkShifts] = useState<WorkShift[]>([
+  const [language, setLanguage] = React.useState("vi");
+  const [soundEnabled, setSoundEnabled] = React.useState(true);
+  const [vibrationEnabled, setVibrationEnabled] = React.useState(true);
+  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [showWorkShiftForm, setShowWorkShiftForm] = React.useState(false);
+  const [editingShift, setEditingShift] = React.useState<WorkShift | null>(null);
+  const [workShifts, setWorkShifts] = React.useState<WorkShift[]>([
     {
       id: "1",
       name: "Ca Ngay",
@@ -345,3 +345,4 @@ const Settings = () => {
 
 Settings.displayName = "Settings";
 export default Settings;
+
