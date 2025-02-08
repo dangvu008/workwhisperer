@@ -43,6 +43,10 @@ interface Note {
   reminderTime: string;
 }
 
+interface NoteSectionProps {
+  language?: string;
+}
+
 const noteSchema = z.object({
   title: z.string()
     .min(1, "Tiêu đề không được để trống")
@@ -55,10 +59,12 @@ const noteSchema = z.object({
 
 type NoteFormData = z.infer<typeof noteSchema>;
 
-export const NoteSection = () => {
+export const NoteSection = ({ language = "vi" }: NoteSectionProps) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+
+  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
   const form = useForm<NoteFormData>({
     resolver: zodResolver(noteSchema),
@@ -81,7 +87,7 @@ export const NoteSection = () => {
             }
           : note
       ));
-      toast.success("Đã cập nhật ghi chú");
+      toast.success(getText("Note updated", "Đã cập nhật ghi chú"));
     } else {
       const newNote: Note = {
         id: Date.now().toString(),
@@ -90,7 +96,7 @@ export const NoteSection = () => {
         reminderTime: data.reminderTime,
       };
       setNotes([newNote, ...notes].slice(0, 3));
-      toast.success("Đã thêm ghi chú mới");
+      toast.success(getText("New note added", "Đã thêm ghi chú mới"));
     }
     setIsDialogOpen(false);
     form.reset();
@@ -109,23 +115,23 @@ export const NoteSection = () => {
 
   const deleteNote = (id: string) => {
     setNotes(notes.filter(note => note.id !== id));
-    toast.success("Đã xóa ghi chú");
+    toast.success(getText("Note deleted", "Đã xóa ghi chú"));
   };
 
   return (
     <Card className="bg-[#1A1F2C]/50 border-[#2A2F3C] p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium">Ghi chú</h2>
+        <h2 className="text-lg font-medium">{getText("Notes", "Ghi chú")}</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90 transition-colors duration-200">
-              + Thêm ghi chú
+              + {getText("Add note", "Thêm ghi chú")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingNote ? "Chỉnh sửa ghi chú" : "Thêm ghi chú mới"}
+                {editingNote ? getText("Edit note", "Chỉnh sửa ghi chú") : getText("Add new note", "Thêm ghi chú mới")}
               </DialogTitle>
             </DialogHeader>
             <Form {...form}>
@@ -135,9 +141,9 @@ export const NoteSection = () => {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tiêu đề</FormLabel>
+                      <FormLabel>{getText("Title", "Tiêu đề")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nhập tiêu đề..." {...field} />
+                        <Input placeholder={getText("Enter title...", "Nhập tiêu đề...")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -148,10 +154,10 @@ export const NoteSection = () => {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nội dung</FormLabel>
+                      <FormLabel>{getText("Content", "Nội dung")}</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Nhập nội dung..." 
+                          placeholder={getText("Enter content...", "Nhập nội dung...")}
                           className="min-h-[100px]" 
                           {...field} 
                         />
@@ -165,7 +171,7 @@ export const NoteSection = () => {
                   name="reminderTime"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Thời gian nhắc nhở</FormLabel>
+                      <FormLabel>{getText("Reminder time", "Thời gian nhắc nhở")}</FormLabel>
                       <FormControl>
                         <Input type="time" {...field} />
                       </FormControl>
@@ -183,10 +189,10 @@ export const NoteSection = () => {
                       setEditingNote(null);
                     }}
                   >
-                    Hủy
+                    {getText("Cancel", "Hủy")}
                   </Button>
                   <Button type="submit">
-                    {editingNote ? "Cập nhật" : "Thêm"}
+                    {editingNote ? getText("Update", "Cập nhật") : getText("Add", "Thêm")}
                   </Button>
                 </div>
               </form>
@@ -197,7 +203,7 @@ export const NoteSection = () => {
       
       {notes.length === 0 ? (
         <div className="text-center text-muted-foreground py-8">
-          Chưa có ghi chú nào
+          {getText("No notes yet", "Chưa có ghi chú nào")}
         </div>
       ) : (
         <div className="space-y-4">
@@ -210,7 +216,7 @@ export const NoteSection = () => {
                     {note.content}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Nhắc nhở: {note.reminderTime}
+                    {getText("Reminder: ", "Nhắc nhở: ")}{note.reminderTime}
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
@@ -229,15 +235,18 @@ export const NoteSection = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                        <AlertDialogTitle>{getText("Confirm deletion", "Xác nhận xóa")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Bạn có chắc chắn muốn xóa ghi chú này? Hành động này không thể hoàn tác.
+                          {getText(
+                            "Are you sure you want to delete this note? This action cannot be undone.",
+                            "Bạn có chắc chắn muốn xóa ghi chú này? Hành động này không thể hoàn tác."
+                          )}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogCancel>{getText("Cancel", "Hủy")}</AlertDialogCancel>
                         <AlertDialogAction onClick={() => deleteNote(note.id)}>
-                          Xác nhận
+                          {getText("Confirm", "Xác nhận")}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
