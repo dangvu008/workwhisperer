@@ -40,16 +40,17 @@ export const WorkShiftList = ({
   onSetActiveShift,
 }: WorkShiftListProps) => {
   const { toast } = useToast();
+  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
   return (
     <div className="bg-[#1A1F2C] rounded-lg p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-semibold mb-1">
-            {language === "vi" ? "Ca làm việc" : "Work Shifts"}
+            {getText("Work Shifts", "Ca làm việc")}
           </h2>
           <p className="text-sm text-gray-400">
-            {language === "vi" ? "Quản lý ca làm việc" : "Manage work shifts"}
+            {getText("Manage work shifts", "Quản lý ca làm việc")}
           </p>
         </div>
         <Button 
@@ -64,20 +65,20 @@ export const WorkShiftList = ({
 
       <div className="space-y-4">
         <div className="flex items-center justify-between text-sm text-gray-400">
-          <span>{language === "vi" ? "Nhắc nhở thay đổi ca" : "Shift change reminder"}</span>
+          <span>{getText("Shift change reminder", "Nhắc nhở thay đổi ca")}</span>
           <Select defaultValue="none">
             <SelectTrigger className="w-[180px] bg-[#2A2F3C] border-[#3A3F4C]">
-              <SelectValue placeholder={language === "vi" ? "Không nhắc nhở" : "No reminder"} />
+              <SelectValue placeholder={getText("No reminder", "Không nhắc nhở")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">
-                {language === "vi" ? "Không nhắc nhở" : "No reminder"}
+                {getText("No reminder", "Không nhắc nhở")}
               </SelectItem>
               <SelectItem value="15">
-                {language === "vi" ? "15 phút trước" : "15 minutes before"}
+                {getText("15 minutes before", "15 phút trước")}
               </SelectItem>
               <SelectItem value="30">
-                {language === "vi" ? "30 phút trước" : "30 minutes before"}
+                {getText("30 minutes before", "30 phút trước")}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -95,7 +96,7 @@ export const WorkShiftList = ({
               </p>
               {shift.isActive && (
                 <p className="text-xs text-gray-400 mt-1">
-                  {language === "vi" ? "Đang áp dụng cho tuần này" : "Applied for this week"}
+                  {getText("Applied for this week", "Đang áp dụng cho tuần này")}
                 </p>
               )}
             </div>
@@ -123,7 +124,7 @@ export const WorkShiftList = ({
                 onClick={() => {
                   onDeleteShift(shift.id);
                   toast({
-                    title: "Đã xóa ca làm việc",
+                    title: getText("Work shift deleted", "Đã xóa ca làm việc"),
                     duration: 2000,
                   });
                 }}
