@@ -18,67 +18,85 @@ import { toast } from "sonner";
 
 type ButtonState = "idle" | "go_work" | "check_in" | "check_out";
 
-export const ShiftStatus = () => {
+interface ShiftStatusProps {
+  language?: string;
+}
+
+export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
   const [buttonState, setButtonState] = useState<ButtonState>("idle");
   const [workStartTime, setWorkStartTime] = useState<string | null>(null);
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
+
+  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
   const resetState = () => {
     setButtonState("idle");
     setWorkStartTime(null);
     setCheckInTime(null);
     setCheckOutTime(null);
-    toast.success("Đã đặt lại trạng thái");
+    toast.success(getText("Status reset successfully", "Đã đặt lại trạng thái"));
   };
 
   const getButtonConfig = (state: ButtonState) => {
     switch (state) {
       case "idle":
         return {
-          text: "Đi làm",
+          text: getText("Go to work", "Đi làm"),
           icon: <LogIn className="w-6 h-6" />,
           color: "bg-emerald-500 hover:bg-emerald-600",
-          confirmMessage: "Bạn có chắc chắn muốn bắt đầu ca làm việc?",
+          confirmMessage: getText(
+            "Are you sure you want to start your work shift?",
+            "Bạn có chắc chắn muốn bắt đầu ca làm việc?"
+          ),
           action: () => {
             setWorkStartTime(new Date().toLocaleTimeString());
             setButtonState("go_work");
-            toast.success("Đã bắt đầu ca làm việc");
+            toast.success(getText("Work shift started", "Đã bắt đầu ca làm việc"));
           }
         };
       case "go_work":
         return {
-          text: "Chấm công vào",
+          text: getText("Clock in", "Chấm công vào"),
           icon: <CheckCircle2 className="w-6 h-6" />,
           color: "bg-blue-500 hover:bg-blue-600",
-          confirmMessage: "Xác nhận chấm công vào?",
+          confirmMessage: getText(
+            "Confirm clock in?",
+            "Xác nhận chấm công vào?"
+          ),
           action: () => {
             setCheckInTime(new Date().toLocaleTimeString());
             setButtonState("check_in");
-            toast.success("Đã chấm công vào");
+            toast.success(getText("Clocked in successfully", "Đã chấm công vào"));
           }
         };
       case "check_in":
         return {
-          text: "Tan làm",
+          text: getText("Clock out", "Tan làm"),
           icon: <LogOut className="w-6 h-6" />,
           color: "bg-violet-500 hover:bg-violet-600",
-          confirmMessage: "Xác nhận kết thúc ca làm việc?",
+          confirmMessage: getText(
+            "Confirm end of work shift?",
+            "Xác nhận kết thúc ca làm việc?"
+          ),
           action: () => {
             setCheckOutTime(new Date().toLocaleTimeString());
             setButtonState("check_out");
-            toast.success("Đã chấm công ra");
+            toast.success(getText("Clocked out successfully", "Đã chấm công ra"));
           }
         };
       case "check_out":
         return {
-          text: "Ký công",
+          text: getText("Sign off", "Ký công"),
           icon: <RotateCcw className="w-6 h-6" />,
           color: "bg-gray-500 hover:bg-gray-600",
-          confirmMessage: "Xác nhận ký công và kết thúc ca làm việc?",
+          confirmMessage: getText(
+            "Confirm sign off and end work shift?",
+            "Xác nhận ký công và kết thúc ca làm việc?"
+          ),
           action: () => {
             resetState();
-            toast.success("Đã hoàn thành ca làm việc");
+            toast.success(getText("Work shift completed", "Đã hoàn thành ca làm việc"));
           }
         };
     }
@@ -92,7 +110,9 @@ export const ShiftStatus = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <CalendarDays className="w-5 h-5 text-blue-400" />
-            <h2 className="text-lg font-medium text-blue-400">Ca Ngày</h2>
+            <h2 className="text-lg font-medium text-blue-400">
+              {getText("Day Shift", "Ca Ngày")}
+            </h2>
           </div>
           <div className="text-muted-foreground text-sm">
             08:00 → 20:00
@@ -110,15 +130,19 @@ export const ShiftStatus = () => {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Xác nhận thao tác</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {getText("Confirm Action", "Xác nhận thao tác")}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   {currentConfig.confirmMessage}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogCancel>
+                  {getText("Cancel", "Hủy")}
+                </AlertDialogCancel>
                 <AlertDialogAction onClick={currentConfig.action}>
-                  Xác nhận
+                  {getText("Confirm", "Xác nhận")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -137,15 +161,22 @@ export const ShiftStatus = () => {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Xác nhận đặt lại</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    {getText("Confirm Reset", "Xác nhận đặt lại")}
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Bạn có chắc chắn muốn đặt lại trạng thái? Hành động này không thể hoàn tác.
+                    {getText(
+                      "Are you sure you want to reset the status? This action cannot be undone.",
+                      "Bạn có chắc chắn muốn đặt lại trạng thái? Hành động này không thể hoàn tác."
+                    )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Hủy</AlertDialogCancel>
+                  <AlertDialogCancel>
+                    {getText("Cancel", "Hủy")}
+                  </AlertDialogCancel>
                   <AlertDialogAction onClick={resetState}>
-                    Xác nhận
+                    {getText("Confirm", "Xác nhận")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -155,17 +186,17 @@ export const ShiftStatus = () => {
         <div className="mt-4 space-y-2">
           {workStartTime && (
             <div className="text-center text-muted-foreground text-sm">
-              Đã đi làm {workStartTime}
+              {getText("Started work at ", "Đã đi làm ")} {workStartTime}
             </div>
           )}
           {checkInTime && (
             <div className="text-center text-blue-400 text-sm">
-              Chấm công vào {checkInTime}
+              {getText("Clocked in at ", "Chấm công vào ")} {checkInTime}
             </div>
           )}
           {checkOutTime && (
             <div className="text-center text-violet-400 text-sm">
-              Chấm công ra {checkOutTime}
+              {getText("Clocked out at ", "Chấm công ra ")} {checkOutTime}
             </div>
           )}
         </div>

@@ -42,7 +42,7 @@ const Index = () => {
         
         <div className="space-y-6">
           <TimeDisplay language={language} />
-          <ShiftStatus />
+          <ShiftStatus language={language} />
           <WeeklySchedule />
           <NoteSection />
         </div>
