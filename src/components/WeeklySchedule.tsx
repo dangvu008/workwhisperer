@@ -40,6 +40,10 @@ interface DayStatus {
   reason?: string;
 }
 
+interface WeeklyScheduleProps {
+  language?: string;
+}
+
 const vietnameseWeekdays: Record<string, string> = {
   'Mon': 'T2',
   'Tue': 'T3',
@@ -50,16 +54,18 @@ const vietnameseWeekdays: Record<string, string> = {
   'Sun': 'CN'
 };
 
-export const WeeklySchedule = () => {
+export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
+
+  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
   // Mock data with more realistic scenarios
   const [statuses, setStatuses] = useState<Record<string, DayStatus>>({
     "2024-03-18": { status: "complete", checkIn: "08:00", checkOut: "17:30" },
     "2024-03-19": { status: "warning", checkIn: "08:30" },
-    "2024-03-20": { status: "leave", reason: "Nghỉ phép năm" },
-    "2024-03-21": { status: "sick", reason: "Nghỉ ốm có đơn" },
+    "2024-03-20": { status: "leave", reason: getText("Annual Leave", "Nghỉ phép năm") },
+    "2024-03-21": { status: "sick", reason: getText("Sick Leave", "Nghỉ ốm có đơn") },
   });
 
   const getStatusIcon = (status: AttendanceStatus) => {
@@ -89,30 +95,30 @@ export const WeeklySchedule = () => {
   };
 
   const getStatusText = (status: AttendanceStatus): string => {
-    const statusEmojis: Record<AttendanceStatus, string> = {
-      warning: "❗ Thiếu chấm công",
-      complete: "✅ Đủ công",
-      pending: "❓ Chưa cập nhật",
-      leave: "📩 Nghỉ phép",
-      sick: "🛌 Nghỉ bệnh",
-      holiday: "🎌 Nghỉ lễ",
-      absent: "❌ Vắng không lý do"
+    const statusEmojis: Record<AttendanceStatus, { en: string; vi: string }> = {
+      warning: { en: "❗ Missing Time Card", vi: "❗ Thiếu chấm công" },
+      complete: { en: "✅ Complete", vi: "✅ Đủ công" },
+      pending: { en: "❓ Not Updated", vi: "❓ Chưa cập nhật" },
+      leave: { en: "📩 On Leave", vi: "📩 Nghỉ phép" },
+      sick: { en: "🛌 Sick Leave", vi: "🛌 Nghỉ bệnh" },
+      holiday: { en: "🎌 Holiday", vi: "🎌 Nghỉ lễ" },
+      absent: { en: "❌ Absent", vi: "❌ Vắng không lý do" }
     };
-    return statusEmojis[status] || statusEmojis.pending;
+    return getText(statusEmojis[status].en, statusEmojis[status].vi);
   };
 
   const getStatusDetails = (date: Date, status?: DayStatus): string => {
-    if (!status) return "Chưa có dữ liệu";
+    if (!status) return getText("No data available", "Chưa có dữ liệu");
     
     let details = getStatusText(status.status);
     
     if (status.checkIn || status.checkOut) {
       details += "\n";
-      if (status.checkIn) details += `Giờ vào: ${status.checkIn}\n`;
-      if (status.checkOut) details += `Giờ ra: ${status.checkOut}`;
+      if (status.checkIn) details += `${getText("Check-in: ", "Giờ vào: ")}${status.checkIn}\n`;
+      if (status.checkOut) details += `${getText("Check-out: ", "Giờ ra: ")}${status.checkOut}`;
     }
     if (status.reason) {
-      details += `\nLý do: ${status.reason}`;
+      details += `\n${getText("Reason: ", "Lý do: ")}${status.reason}`;
     }
     return details.trim();
   };
@@ -132,7 +138,9 @@ export const WeeklySchedule = () => {
 
   return (
     <Card className="bg-[#1A1F2C]/50 border-[#2A2F3C] p-4 mb-6">
-      <h2 className="text-lg font-medium mb-4">Trạng thái tuần này</h2>
+      <h2 className="text-lg font-medium mb-4">
+        {getText("This Week's Status", "Trạng thái tuần này")}
+      </h2>
       <div className="grid grid-cols-7 gap-2">
         {weekDays.map((date, i) => {
           const dateStr = format(date, "yyyy-MM-dd");
@@ -150,7 +158,7 @@ export const WeeklySchedule = () => {
                     <TooltipTrigger asChild>
                       <div className={`text-center p-2 rounded-md transition-colors duration-200 ${isPastOrToday ? 'cursor-pointer hover:bg-[#2A2F3C]' : 'cursor-default'}`}>
                         <div className="text-sm text-muted-foreground mb-1">
-                          {weekdayVi}
+                          {language === "vi" ? weekdayVi : weekdayEn}
                         </div>
                         <div className="text-sm font-medium">{format(date, "dd")}</div>
                         <div className="mt-2 flex justify-center">
