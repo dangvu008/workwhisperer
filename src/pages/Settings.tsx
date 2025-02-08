@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Bell, Moon, Sun, User, Clock, ChevronDown, Plus, ArrowLeft, Pencil, Trash2, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -119,7 +118,12 @@ const Settings = () => {
                 {language === "vi" ? "Quản lý ca làm việc" : "Manage work shifts"}
               </p>
             </div>
-            <Button variant="outline" size="icon" className="bg-[#2A2F3C] border-[#3A3F4C] hover:bg-[#3A3F4C]">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="bg-[#2A2F3C] border-[#3A3F4C] hover:bg-[#3A3F4C]"
+              onClick={() => setShowWorkShiftForm(true)}
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -277,4 +281,32 @@ const Settings = () => {
   );
 };
 
+import { WorkShiftForm } from "@/components/WorkShiftForm";
+
+// Add this to the existing state declarations
+const [showWorkShiftForm, setShowWorkShiftForm] = useState(false);
+const [editingShift, setEditingShift] = useState<WorkShift | null>(null);
+
+// Add these functions before the return statement
+const handleSaveWorkShift = (workShiftData: any) => {
+  if (editingShift) {
+    // Update existing shift
+    setWorkShifts(workShifts.map(shift => 
+      shift.id === editingShift.id ? { ...workShiftData, id: shift.id } : shift
+    ));
+  } else {
+    // Add new shift
+    setWorkShifts([...workShifts, { id: Date.now().toString(), ...workShiftData, isActive: false }]);
+  }
+  setShowWorkShiftForm(false);
+  setEditingShift(null);
+};
+
+const handleEditShift = (shift: WorkShift) => {
+  setEditingShift(shift);
+  setShowWorkShiftForm(true);
+};
+
+// Add this before the closing return statement
+Settings.displayName = "Settings";
 export default Settings;
