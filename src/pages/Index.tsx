@@ -6,16 +6,20 @@ import { NoteSection } from "@/components/NoteSection";
 import { Button } from "@/components/ui/button";
 import { Settings, BarChart2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "vi");
+
+  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C] text-foreground p-4">
       <div className="max-w-md mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Time Manager
+            {getText("Time Manager", "Quản lý thời gian")}
           </h1>
           <div className="flex gap-3">
             <Button 
@@ -37,7 +41,7 @@ const Index = () => {
         </div>
         
         <div className="space-y-6">
-          <TimeDisplay />
+          <TimeDisplay language={language} />
           <ShiftStatus />
           <WeeklySchedule />
           <NoteSection />
