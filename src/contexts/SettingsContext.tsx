@@ -36,6 +36,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     } else {
       document.documentElement.classList.remove("dark");
     }
+    // Dispatch a custom event when dark mode changes
+    window.dispatchEvent(new CustomEvent('darkmode-changed', { detail: { isDarkMode } }));
   }, [isDarkMode]);
 
   // Update localStorage when settings change

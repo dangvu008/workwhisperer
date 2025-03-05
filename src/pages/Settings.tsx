@@ -91,11 +91,11 @@ const Settings = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-[#0A0F1C]' : 'bg-[#f8fafc]'} transition-colors duration-300`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-[#0A0F1C] text-white' : 'bg-[#f8fafc] text-gray-800'}`}>
       <div className="max-w-2xl mx-auto p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+          <h1 className="text-2xl font-bold">
             {language === "vi" ? "Cài đặt" : "Settings"}
           </h1>
           <Link to="/" className={`${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-800'}`}>

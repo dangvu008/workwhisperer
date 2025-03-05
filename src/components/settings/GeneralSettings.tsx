@@ -35,8 +35,8 @@ export const GeneralSettings = ({
   const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
   return (
-    <div className={`${isDarkMode ? 'bg-[#1A1F2C]' : 'bg-[#f1f5f9]'} rounded-lg p-6 transition-colors duration-300`}>
-      <h2 className={`text-xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+    <div className={`rounded-lg p-6 transition-colors duration-300 ${isDarkMode ? 'bg-[#1A1F2C] text-white' : 'bg-[#f1f5f9] text-gray-800'}`}>
+      <h2 className="text-xl font-semibold mb-6">
         {getText("General Settings", "Cài đặt chung")}
       </h2>
       
@@ -45,7 +45,7 @@ export const GeneralSettings = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div>
-              <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+              <Label className="text-base font-medium">
                 {getText("Dark Mode", "Chế độ tối")}
               </Label>
               <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -65,14 +65,14 @@ export const GeneralSettings = ({
 
         {/* Language */}
         <div className="space-y-2">
-          <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+          <Label className="text-base font-medium">
             {getText("Language", "Ngôn ngữ")}
           </Label>
           <Select value={language} onValueChange={onLanguageChange}>
-            <SelectTrigger className={`w-full ${isDarkMode ? 'bg-[#2A2F3C] border-[#3A3F4C]' : 'bg-white border-gray-300'}`}>
+            <SelectTrigger className={`w-full ${isDarkMode ? 'bg-[#2A2F3C] border-[#3A3F4C] text-white' : 'bg-white border-gray-300 text-gray-800'}`}>
               <SelectValue placeholder={getText("Select language", "Chọn ngôn ngữ")} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={isDarkMode ? 'bg-[#2A2F3C] border-[#3A3F4C] text-white' : 'bg-white border-gray-300 text-gray-800'}>
               <SelectItem value="vi">Tiếng Việt</SelectItem>
               <SelectItem value="en">English</SelectItem>
             </SelectContent>
@@ -82,7 +82,7 @@ export const GeneralSettings = ({
         {/* Notification Sound */}
         <div className="flex items-center justify-between">
           <div>
-            <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            <Label className="text-base font-medium">
               {getText("Notification Sound", "Âm thanh thông báo")}
             </Label>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -102,7 +102,7 @@ export const GeneralSettings = ({
         {/* Vibration */}
         <div className="flex items-center justify-between">
           <div>
-            <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            <Label className="text-base font-medium">
               {getText("Notification Vibration", "Rung thông báo")}
             </Label>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -114,7 +114,7 @@ export const GeneralSettings = ({
           </div>
           <Switch
             checked={vibrationEnabled}
-            onCheckedChange={onVibrationChange}
+            onCheckedChange={onVibrationEnabled}
             className="data-[state=checked]:bg-blue-500"
           />
         </div>
