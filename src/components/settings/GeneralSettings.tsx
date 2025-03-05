@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface GeneralSettingsProps {
   language: string;
@@ -34,8 +35,8 @@ export const GeneralSettings = ({
   const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
   return (
-    <div className="bg-[#1A1F2C] rounded-lg p-6">
-      <h2 className="text-xl font-semibold mb-6">
+    <div className={`${isDarkMode ? 'bg-[#1A1F2C]' : 'bg-[#f1f5f9]'} rounded-lg p-6 transition-colors duration-300`}>
+      <h2 className={`text-xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
         {getText("General Settings", "Cài đặt chung")}
       </h2>
       
@@ -44,10 +45,10 @@ export const GeneralSettings = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="text-base font-medium">
+              <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 {getText("Dark Mode", "Chế độ tối")}
               </Label>
-              <p className="text-sm text-gray-400">
+              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {getText(
                   "Enable dark mode for a better viewing experience in low light conditions",
                   "Bật chế độ tối để có trải nghiệm xem tốt hơn trong điều kiện ánh sáng yếu"
@@ -64,11 +65,11 @@ export const GeneralSettings = ({
 
         {/* Language */}
         <div className="space-y-2">
-          <Label className="text-base font-medium">
+          <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             {getText("Language", "Ngôn ngữ")}
           </Label>
           <Select value={language} onValueChange={onLanguageChange}>
-            <SelectTrigger className="w-full bg-[#2A2F3C] border-[#3A3F4C]">
+            <SelectTrigger className={`w-full ${isDarkMode ? 'bg-[#2A2F3C] border-[#3A3F4C]' : 'bg-white border-gray-300'}`}>
               <SelectValue placeholder={getText("Select language", "Chọn ngôn ngữ")} />
             </SelectTrigger>
             <SelectContent>
@@ -81,10 +82,10 @@ export const GeneralSettings = ({
         {/* Notification Sound */}
         <div className="flex items-center justify-between">
           <div>
-            <Label className="text-base font-medium">
+            <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               {getText("Notification Sound", "Âm thanh thông báo")}
             </Label>
-            <p className="text-sm text-gray-400">
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {getText(
                 "Play sound when notifications arrive",
                 "Phát âm thanh khi có thông báo"
@@ -101,10 +102,10 @@ export const GeneralSettings = ({
         {/* Vibration */}
         <div className="flex items-center justify-between">
           <div>
-            <Label className="text-base font-medium">
+            <Label className={`text-base font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               {getText("Notification Vibration", "Rung thông báo")}
             </Label>
-            <p className="text-sm text-gray-400">
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {getText(
                 "Vibrate when notifications arrive",
                 "Rung khi có thông báo"

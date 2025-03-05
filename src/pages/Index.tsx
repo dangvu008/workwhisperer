@@ -6,22 +6,11 @@ import { NoteSection } from "@/components/NoteSection";
 import { Button } from "@/components/ui/button";
 import { Settings, BarChart2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "vi");
-
-  useEffect(() => {
-    // Listen for language changes in localStorage
-    const handleStorageChange = () => {
-      const newLanguage = localStorage.getItem("language") || "vi";
-      setLanguage(newLanguage);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+  const { language } = useSettings();
 
   const getText = (en: string, vi: string) => language === "vi" ? vi : en;
   
@@ -63,4 +52,3 @@ const Index = () => {
 };
 
 export default Index;
-
