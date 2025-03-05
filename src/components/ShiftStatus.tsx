@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { CalendarDays, LogIn, LogOut, CheckCircle2, RotateCcw, RefreshCw, History } from "lucide-react";
+import { CalendarDays, LogIn, LogOut, CheckCircle2, RotateCcw, RefreshCw } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,14 +13,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 type ButtonState = "idle" | "go_work" | "check_in" | "check_out";
@@ -209,50 +200,6 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
               </AlertDialogContent>
             </AlertDialog>
           )}
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute -left-2 top-0 rounded-full w-8 h-8"
-              >
-                <History className="w-3 h-3 text-muted-foreground hover:text-primary transition-colors duration-200" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {getText("Action History", "Lịch sử thao tác")}
-                </DialogTitle>
-                <DialogDescription>
-                  {getText(
-                    "Your recent actions and timestamps.",
-                    "Các thao tác gần đây và thời gian thực hiện."
-                  )}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="max-h-[300px] overflow-y-auto">
-                {history.length > 0 ? (
-                  <div className="space-y-2">
-                    {history.map((entry, index) => (
-                      <div key={index} className="flex items-center justify-between py-2 border-b border-gray-700">
-                        <div className="flex items-center gap-2">
-                          {entry.icon}
-                          <span>{entry.action}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">{entry.time}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-4 text-muted-foreground">
-                    {getText("No history yet", "Chưa có lịch sử thao tác")}
-                  </div>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
         <div className="mt-4 space-y-2">
           {workStartTime && (
