@@ -10,12 +10,12 @@ import { useSettings } from "@/contexts/SettingsContext";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { language } = useSettings();
+  const { language, isDarkMode } = useSettings();
 
   const getText = (en: string, vi: string) => language === "vi" ? vi : en;
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C] text-foreground p-4">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C]' : 'bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe]'} transition-colors duration-300 text-foreground p-4`}>
       <div className="max-w-md mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -25,7 +25,7 @@ const Index = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              className={`${isDarkMode ? 'text-muted-foreground hover:text-primary' : 'text-gray-600 hover:text-primary'} transition-colors duration-200`}
               onClick={() => navigate("/settings")}
             >
               <Settings className="w-5 h-5" />
@@ -33,7 +33,7 @@ const Index = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="text-muted-foreground hover:text-primary transition-colors duration-200"
+              className={`${isDarkMode ? 'text-muted-foreground hover:text-primary' : 'text-gray-600 hover:text-primary'} transition-colors duration-200`}
             >
               <BarChart2 className="w-5 h-5" />
             </Button>

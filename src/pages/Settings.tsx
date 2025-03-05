@@ -48,7 +48,9 @@ const Settings = () => {
     setDarkMode(enabled);
     
     toast({
-      title: enabled ? "Đã bật chế độ tối" : "Đã tắt chế độ tối",
+      title: enabled 
+        ? language === "vi" ? "Đã bật chế độ tối" : "Dark mode enabled" 
+        : language === "vi" ? "Đã tắt chế độ tối" : "Light mode enabled",
       duration: 2000,
     });
   };
@@ -69,7 +71,7 @@ const Settings = () => {
         shift.id === editingShift.id ? { ...workShiftData, id: shift.id, isActive: shift.isActive } : shift
       ));
       toast({
-        title: "Cập nhật ca làm việc thành công",
+        title: language === "vi" ? "Cập nhật ca làm việc thành công" : "Work shift updated successfully",
         duration: 2000,
       });
     } else {
@@ -80,7 +82,7 @@ const Settings = () => {
         isActive: false 
       }]);
       toast({
-        title: "Thêm ca làm việc mới thành công",
+        title: language === "vi" ? "Thêm ca làm việc mới thành công" : "New work shift added successfully",
         duration: 2000,
       });
     }
@@ -89,12 +91,14 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1C] text-white">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-[#0A0F1C]' : 'bg-[#f8fafc]'} transition-colors duration-300`}>
       <div className="max-w-2xl mx-auto p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold">{language === "vi" ? "Cài đặt" : "Settings"}</h1>
-          <Link to="/" className="text-gray-400 hover:text-white">
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+            {language === "vi" ? "Cài đặt" : "Settings"}
+          </h1>
+          <Link to="/" className={`${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-800'}`}>
             <ArrowLeft className="h-6 w-6" />
           </Link>
         </div>

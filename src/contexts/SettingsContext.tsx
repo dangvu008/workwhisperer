@@ -29,9 +29,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     return savedVibration ? savedVibration === "true" : true;
   });
 
-  // Apply dark mode to document when it changes
+  // Apply dark mode class to document when it changes
   React.useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode);
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, [isDarkMode]);
 
   // Update localStorage when settings change
