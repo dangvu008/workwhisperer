@@ -94,16 +94,17 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
     }
   };
 
+  const statusEmojis: Record<AttendanceStatus, { en: string; vi: string }> = {
+    warning: { en: "❗ Missing Time Card", vi: "❗ Thiếu chấm công" },
+    complete: { en: "✅ Complete", vi: "✅ Đủ công" },
+    pending: { en: "❓ Not Updated", vi: "❓ Chưa cập nhật" },
+    leave: { en: "📩 On Leave", vi: "📩 Nghỉ phép" },
+    sick: { en: "🛌 Sick Leave", vi: "🛌 Nghỉ bệnh" },
+    holiday: { en: "🎌 Holiday", vi: "🎌 Nghỉ lễ" },
+    absent: { en: "❌ Absent", vi: "❌ Vắng không lý do" }
+  };
+
   const getStatusText = (status: AttendanceStatus): string => {
-    const statusEmojis: Record<AttendanceStatus, { en: string; vi: string }> = {
-      warning: { en: "❗ Missing Time Card", vi: "❗ Thiếu chấm công" },
-      complete: { en: "✅ Complete", vi: "✅ Đủ công" },
-      pending: { en: "❓ Not Updated", vi: "❓ Chưa cập nhật" },
-      leave: { en: "📩 On Leave", vi: "📩 Nghỉ phép" },
-      sick: { en: "🛌 Sick Leave", vi: "🛌 Nghỉ bệnh" },
-      holiday: { en: "🎌 Holiday", vi: "🎌 Nghỉ lễ" },
-      absent: { en: "❌ Absent", vi: "❌ Vắng không lý do" }
-    };
     return getText(statusEmojis[status].en, statusEmojis[status].vi);
   };
 
@@ -169,7 +170,7 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
                   </ContextMenuTrigger>
                   {isPastOrToday && (
                     <ContextMenuContent className="w-48">
-                      {Object.keys(getStatusText({} as AttendanceStatus)).map((key) => (
+                      {Object.keys(statusEmojis).map((key) => (
                         <ContextMenuItem
                           key={key}
                           onClick={() => updateStatus(dateStr, key as AttendanceStatus)}
@@ -195,4 +196,3 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
     </Card>
   );
 };
-
