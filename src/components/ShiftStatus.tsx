@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { CalendarDays, LogIn, LogOut, CheckCircle2, RotateCcw, RefreshCw } from "lucide-react";
+import { CalendarDays, LogIn, LogOut, CheckCircle2, RotateCcw, RefreshCw, History } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,9 +14,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 type ButtonState = "idle" | "go_work" | "check_in" | "check_out";
+type HistoryEntry = {
+  action: string;
+  time: string;
+  icon: JSX.Element;
+};
 
 interface ShiftStatusProps {
   language?: string;
@@ -27,14 +40,21 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
   const [workStartTime, setWorkStartTime] = useState<string | null>(null);
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   const getText = (en: string, vi: string) => language === "vi" ? vi : en;
+
+  const addToHistory = (action: string, icon: JSX.Element) => {
+    const time = new Date().toLocaleTimeString();
+    setHistory(prev => [...prev, { action, time, icon }]);
+  };
 
   const resetState = () => {
     setButtonState("idle");
     setWorkStartTime(null);
     setCheckInTime(null);
     setCheckOutTime(null);
+    addToHistory(getText("Reset status", "Đặt lại trạng thái"), <RefreshCw className="w-4 h-4 text-gray-400" />);
     toast.success(getText("Status reset successfully", "Đã đặt lại trạng thái"));
   };
 
@@ -50,8 +70,10 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
             "Bạn có chắc chắn muốn bắt đầu ca làm việc?"
           ),
           action: () => {
-            setWorkStartTime(new Date().toLocaleTimeString());
+            const time = new Date().toLocaleTimeString();
+            setWorkStartTime(time);
             setButtonState("go_work");
+            addToHistory(getText("Started work", "Đi làm"), <LogIn className="w-4 h-4 text-emerald-500" />);
             toast.success(getText("Work shift started", "Đã bắt đầu ca làm việc"));
           }
         };
@@ -65,8 +87,10 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
             "Xác nhận chấm công vào?"
           ),
           action: () => {
-            setCheckInTime(new Date().toLocaleTimeString());
+            const time = new Date().toLocaleTimeString();
+            setCheckInTime(time);
             setButtonState("check_in");
+            addToHistory(getText("Clocked in", "Chấm công vào"), <CheckCircle2 className="w-4 h-4 text-blue-500" />);
             toast.success(getText("Clocked in successfully", "Đã chấm công vào"));
           }
         };
@@ -80,8 +104,10 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
             "Xác nhận kết thúc ca làm việc?"
           ),
           action: () => {
-            setCheckOutTime(new Date().toLocaleTimeString());
+            const time = new Date().toLocaleTimeString();
+            setCheckOutTime(time);
             setButtonState("check_out");
+            addToHistory(getText("Clocked out", "Tan làm"), <LogOut className="w-4 h-4 text-violet-500" />);
             toast.success(getText("Clocked out successfully", "Đã chấm công ra"));
           }
         };
@@ -95,6 +121,7 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
             "Xác nhận ký công và kết thúc ca làm việc?"
           ),
           action: () => {
+            addToHistory(getText("Signed off", "Ký công"), <RotateCcw className="w-4 h-4 text-gray-500" />);
             resetState();
             toast.success(getText("Work shift completed", "Đã hoàn thành ca làm việc"));
           }
@@ -182,6 +209,50 @@ export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
               </AlertDialogContent>
             </AlertDialog>
           )}
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute -left-2 top-0 rounded-full w-8 h-8"
+              >
+                <History className="w-3 h-3 text-muted-foreground hover:text-primary transition-colors duration-200" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {getText("Action History", "Lịch sử thao tác")}
+                </DialogTitle>
+                <DialogDescription>
+                  {getText(
+                    "Your recent actions and timestamps.",
+                    "Các thao tác gần đây và thời gian thực hiện."
+                  )}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="max-h-[300px] overflow-y-auto">
+                {history.length > 0 ? (
+                  <div className="space-y-2">
+                    {history.map((entry, index) => (
+                      <div key={index} className="flex items-center justify-between py-2 border-b border-gray-700">
+                        <div className="flex items-center gap-2">
+                          {entry.icon}
+                          <span>{entry.action}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{entry.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    {getText("No history yet", "Chưa có lịch sử thao tác")}
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         <div className="mt-4 space-y-2">
           {workStartTime && (
