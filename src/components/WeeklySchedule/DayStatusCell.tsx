@@ -14,13 +14,13 @@ import {
 } from "@/components/ui/context-menu";
 import { AttendanceStatus, DayStatus } from "@/types/attendance";
 import { 
-  getStatusIcon, 
   getStatusDetails, 
   getStatusBackgroundColor,
   getStatusText,
   vietnameseWeekdays,
   statusEmojis
 } from "@/utils/attendanceUtils";
+import { getStatusIcon } from "@/components/WeeklySchedule/StatusIcons";
 
 interface DayStatusCellProps {
   date: Date;

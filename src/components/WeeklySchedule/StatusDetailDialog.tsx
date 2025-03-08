@@ -9,7 +9,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { DayStatus } from "@/types/attendance";
-import { getStatusIcon, getStatusText } from "@/utils/attendanceUtils";
+import { getStatusText } from "@/utils/attendanceUtils";
+import { getStatusIcon } from "@/components/WeeklySchedule/StatusIcons";
 
 interface StatusDetailDialogProps {
   selectedDay: Date | null;
