@@ -23,7 +23,17 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 type AttendanceStatus = 
   | "warning"  // ❗ Đi làm nhưng thiếu chấm công
@@ -59,6 +69,9 @@ const vietnameseWeekdays: Record<string, string> = {
 export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
   const startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(startDate, i));
+  const { toast } = useToast();
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<DayStatus | null>(null);
 
   const getText = (en: string, vi: string) => language === "vi" ? vi : en;
 
@@ -130,16 +143,36 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
     return details.trim();
   };
 
-  const updateStatus = (dateStr: string, newStatus: AttendanceStatus) => {
+  const handleStatusChange = (dateStr: string, newStatus: AttendanceStatus) => {
     setStatuses(prev => {
       const currentStatus = prev[dateStr] || {};
+      
+      // Prepare updated status object
+      const updatedStatus: DayStatus = { 
+        ...currentStatus,
+        status: newStatus
+      };
+      
+      // For leave and sick statuses, add a default reason if none exists
+      if ((newStatus === "leave" || newStatus === "sick") && !updatedStatus.reason) {
+        updatedStatus.reason = newStatus === "leave" 
+          ? getText("Annual Leave", "Nghỉ phép")
+          : getText("Sick Leave", "Nghỉ ốm");
+      }
+      
       return {
         ...prev,
-        [dateStr]: { 
-          ...currentStatus,
-          status: newStatus,
-        }
+        [dateStr]: updatedStatus
       };
+    });
+
+    // Show toast notification
+    toast({
+      title: getText("Status Updated", "Đã cập nhật trạng thái"),
+      description: getText(
+        `Day status changed to ${statusEmojis[newStatus].en}`,
+        `Trạng thái đã đổi thành ${statusEmojis[newStatus].vi}`
+      ),
     });
   };
 
@@ -156,6 +189,11 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
     }
   };
 
+  const openDetailDialog = (date: Date, status: DayStatus) => {
+    setSelectedDay(date);
+    setSelectedStatus(status);
+  };
+  
   return (
     <Card className="bg-[#1A1F2C]/50 border-[#2A2F3C] p-4 mb-6">
       <h2 className="text-lg font-medium mb-4">
@@ -178,9 +216,14 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
                   <ContextMenuTrigger disabled={!isPastOrToday} asChild>
                     <TooltipTrigger asChild>
                       <div 
-                        className={`text-center p-2 rounded-md transition-colors duration-200 relative
-                        ${isPastOrToday ? 'cursor-pointer hover:bg-[#2A2F3C]' : 'cursor-default'} 
+                        className={`text-center p-2 rounded-md transition-colors duration-200 relative select-none
+                        ${isPastOrToday ? 'cursor-pointer hover:bg-[#2A2F3C]' : 'cursor-default opacity-75'} 
                         ${statusBg}`}
+                        onClick={() => {
+                          if (isPastOrToday && dayStatus) {
+                            openDetailDialog(date, dayStatus);
+                          }
+                        }}
                       >
                         <div className="text-sm text-muted-foreground mb-1">
                           {language === "vi" ? weekdayVi : weekdayEn}
@@ -198,7 +241,7 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
                       {Object.keys(statusEmojis).map((key) => (
                         <ContextMenuItem
                           key={key}
-                          onClick={() => updateStatus(dateStr, key as AttendanceStatus)}
+                          onClick={() => handleStatusChange(dateStr, key as AttendanceStatus)}
                           className="flex items-center gap-2"
                         >
                           {getStatusIcon(key as AttendanceStatus)}
@@ -218,6 +261,62 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
           );
         })}
       </div>
+
+      {/* Detail Dialog for Mobile */}
+      <Dialog open={selectedDay !== null} onOpenChange={(open) => !open && setSelectedDay(null)}>
+        <DialogContent className="w-[90%] max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDay && format(selectedDay, "dd/MM/yyyy")} {getText("Status", "Trạng thái")}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedDay && selectedStatus && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-2">
+                {getStatusIcon(selectedStatus.status)}
+                <span className="font-medium">{getStatusText(selectedStatus.status)}</span>
+              </div>
+              
+              {(selectedStatus.checkIn || selectedStatus.checkOut) && (
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedStatus.checkIn && (
+                    <div>
+                      <Label className="text-muted-foreground">
+                        {getText("Check-in", "Giờ vào")}
+                      </Label>
+                      <div className="font-medium">{selectedStatus.checkIn}</div>
+                    </div>
+                  )}
+                  {selectedStatus.checkOut && (
+                    <div>
+                      <Label className="text-muted-foreground">
+                        {getText("Check-out", "Giờ ra")}
+                      </Label>
+                      <div className="font-medium">{selectedStatus.checkOut}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {selectedStatus.reason && (
+                <div>
+                  <Label className="text-muted-foreground">
+                    {getText("Reason", "Lý do")}
+                  </Label>
+                  <div className="font-medium">{selectedStatus.reason}</div>
+                </div>
+              )}
+              
+              <div className="pt-2">
+                <Button variant="outline" onClick={() => setSelectedDay(null)} className="w-full">
+                  {getText("Close", "Đóng")}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
