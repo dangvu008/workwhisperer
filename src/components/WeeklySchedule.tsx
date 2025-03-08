@@ -8,7 +8,8 @@ import {
   FileText,
   Bed,
   Flag,
-  XCircle
+  XCircle,
+  Clock
 } from "lucide-react";
 import {
   Tooltip,
@@ -31,7 +32,8 @@ type AttendanceStatus =
   | "leave"    // 📩 Nghỉ phép 
   | "sick"     // 🛌 Nghỉ bệnh
   | "holiday"  // 🎌 Nghỉ lễ
-  | "absent";  // ❌ Vắng không lý do
+  | "absent"   // ❌ Vắng không lý do
+  | "late";    // 🕒 RV vào muộn hoặc ra sớm
 
 interface DayStatus {
   status: AttendanceStatus;
@@ -66,6 +68,7 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
     "2024-03-19": { status: "warning", checkIn: "08:30" },
     "2024-03-20": { status: "leave", reason: getText("Annual Leave", "Nghỉ phép năm") },
     "2024-03-21": { status: "sick", reason: getText("Sick Leave", "Nghỉ ốm có đơn") },
+    "2024-03-22": { status: "late", checkIn: "09:15", checkOut: "17:30", reason: getText("Traffic", "Kẹt xe") },
   });
 
   const getStatusIcon = (status: AttendanceStatus) => {
@@ -89,19 +92,22 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
         return <Flag {...iconProps} className="text-red-500" />;
       case "absent":
         return <XCircle {...iconProps} className="text-red-500" />;
+      case "late":
+        return <Clock {...iconProps} className="text-orange-500" />;
       default:
         return <HelpCircle {...iconProps} className="text-gray-400" />;
     }
   };
 
-  const statusEmojis: Record<AttendanceStatus, { en: string; vi: string }> = {
-    warning: { en: "❗ Missing Time Card", vi: "❗ Thiếu chấm công" },
-    complete: { en: "✅ Complete", vi: "✅ Đủ công" },
-    pending: { en: "❓ Not Updated", vi: "❓ Chưa cập nhật" },
-    leave: { en: "📩 On Leave", vi: "📩 Nghỉ phép" },
-    sick: { en: "🛌 Sick Leave", vi: "🛌 Nghỉ bệnh" },
-    holiday: { en: "🎌 Holiday", vi: "🎌 Nghỉ lễ" },
-    absent: { en: "❌ Absent", vi: "❌ Vắng không lý do" }
+  const statusEmojis: Record<AttendanceStatus, { en: string; vi: string, abbr: string }> = {
+    warning: { en: "❗ Missing Time Card", vi: "❗ Thiếu chấm công", abbr: "!" },
+    complete: { en: "✅ Complete", vi: "✅ Đủ công", abbr: "✓" },
+    pending: { en: "❓ Not Updated", vi: "❓ Chưa cập nhật", abbr: "--" },
+    leave: { en: "📩 On Leave", vi: "📩 Nghỉ phép", abbr: "P" },
+    sick: { en: "🛌 Sick Leave", vi: "🛌 Nghỉ bệnh", abbr: "B" },
+    holiday: { en: "🎌 Holiday", vi: "🎌 Nghỉ lễ", abbr: "H" },
+    absent: { en: "❌ Absent", vi: "❌ Vắng không lý do", abbr: "X" },
+    late: { en: "🕒 Late or Early Leave", vi: "🕒 Vào muộn hoặc ra sớm", abbr: "RV" }
   };
 
   const getStatusText = (status: AttendanceStatus): string => {
@@ -137,6 +143,19 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
     });
   };
 
+  const getStatusBackgroundColor = (status: AttendanceStatus): string => {
+    switch (status) {
+      case "warning": return "bg-yellow-100 dark:bg-yellow-900/30";
+      case "complete": return "bg-green-100 dark:bg-green-900/30";
+      case "leave": return "bg-blue-100 dark:bg-blue-900/30";
+      case "sick": return "bg-purple-100 dark:bg-purple-900/30";
+      case "holiday": return "bg-red-100 dark:bg-red-900/30";
+      case "absent": return "bg-red-100 dark:bg-red-900/30";
+      case "late": return "bg-orange-100 dark:bg-orange-900/30";
+      default: return "";
+    }
+  };
+
   return (
     <Card className="bg-[#1A1F2C]/50 border-[#2A2F3C] p-4 mb-6">
       <h2 className="text-lg font-medium mb-4">
@@ -150,6 +169,7 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
           const status = isPastOrToday ? (dayStatus?.status || "pending") : "pending";
           const weekdayEn = format(date, "EEE");
           const weekdayVi = vietnameseWeekdays[weekdayEn];
+          const statusBg = getStatusBackgroundColor(status);
 
           return (
             <TooltipProvider key={i}>
@@ -157,13 +177,18 @@ export const WeeklySchedule = ({ language = "vi" }: WeeklyScheduleProps) => {
                 <ContextMenu>
                   <ContextMenuTrigger disabled={!isPastOrToday} asChild>
                     <TooltipTrigger asChild>
-                      <div className={`text-center p-2 rounded-md transition-colors duration-200 ${isPastOrToday ? 'cursor-pointer hover:bg-[#2A2F3C]' : 'cursor-default'}`}>
+                      <div 
+                        className={`text-center p-2 rounded-md transition-colors duration-200 relative
+                        ${isPastOrToday ? 'cursor-pointer hover:bg-[#2A2F3C]' : 'cursor-default'} 
+                        ${statusBg}`}
+                      >
                         <div className="text-sm text-muted-foreground mb-1">
                           {language === "vi" ? weekdayVi : weekdayEn}
                         </div>
                         <div className="text-sm font-medium">{format(date, "dd")}</div>
-                        <div className="mt-2 flex justify-center">
+                        <div className="mt-2 flex flex-col items-center gap-1">
                           {getStatusIcon(status)}
+                          <span className="text-xs font-medium">{statusEmojis[status].abbr}</span>
                         </div>
                       </div>
                     </TooltipTrigger>
