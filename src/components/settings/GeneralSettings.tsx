@@ -114,7 +114,7 @@ export const GeneralSettings = ({
           </div>
           <Switch
             checked={vibrationEnabled}
-            onCheckedChange={onVibrationEnabled}
+            onCheckedChange={onVibrationChange}
             className="data-[state=checked]:bg-blue-500"
           />
         </div>
