@@ -1,7 +1,7 @@
 
 import { format } from "date-fns";
 import { vi as viLocale, enUS } from "date-fns/locale";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export const TimeDisplay = () => {
   const { currentLanguage } = useLanguage();
