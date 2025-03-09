@@ -1,3 +1,4 @@
+
 import { format, isToday, isBefore } from "date-fns";
 import {
   Tooltip,
@@ -20,11 +21,11 @@ import {
   statusEmojis
 } from "@/utils/attendanceUtils";
 import { getStatusIcon } from "@/components/WeeklySchedule/StatusIcons";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 interface DayStatusCellProps {
   date: Date;
   dayStatus?: DayStatus;
-  language: string;
   onStatusChange: (dateStr: string, status: AttendanceStatus) => void;
   onCellClick: (date: Date, status: DayStatus) => void;
 }
@@ -32,10 +33,11 @@ interface DayStatusCellProps {
 export const DayStatusCell = ({
   date,
   dayStatus,
-  language,
   onStatusChange,
   onCellClick
 }: DayStatusCellProps) => {
+  const { currentLanguage } = useLanguage();
+  
   const dateStr = format(date, "yyyy-MM-dd");
   const isPastOrToday = isBefore(date, new Date()) || isToday(date);
   const status = isPastOrToday ? (dayStatus?.status || "pending") : "pending";
@@ -60,7 +62,7 @@ export const DayStatusCell = ({
                 }}
               >
                 <div className="text-sm text-muted-foreground mb-1">
-                  {language === "vi" ? weekdayVi : weekdayEn}
+                  {currentLanguage === "vi" ? weekdayVi : weekdayEn}
                 </div>
                 <div className="text-sm font-medium">{format(date, "dd")}</div>
                 <div className="mt-2 flex flex-col items-center gap-1">
@@ -79,7 +81,7 @@ export const DayStatusCell = ({
                   className="flex items-center gap-2"
                 >
                   {getStatusIcon(key as AttendanceStatus)}
-                  <span>{getStatusText(key as AttendanceStatus, language)}</span>
+                  <span>{getStatusText(key as AttendanceStatus, currentLanguage)}</span>
                 </ContextMenuItem>
               ))}
             </ContextMenuContent>
@@ -87,7 +89,7 @@ export const DayStatusCell = ({
         </ContextMenu>
         <TooltipContent>
           <p className="whitespace-pre-line">
-            {getStatusDetails(date, dayStatus, language)}
+            {getStatusDetails(date, dayStatus, currentLanguage)}
           </p>
         </TooltipContent>
       </Tooltip>

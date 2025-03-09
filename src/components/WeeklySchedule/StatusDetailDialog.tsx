@@ -11,28 +11,27 @@ import { Button } from "@/components/ui/button";
 import { DayStatus } from "@/types/attendance";
 import { getStatusText } from "@/utils/attendanceUtils";
 import { getStatusIcon } from "@/components/WeeklySchedule/StatusIcons";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 interface StatusDetailDialogProps {
   selectedDay: Date | null;
   selectedStatus: DayStatus | null;
   onClose: () => void;
-  language: string;
 }
 
 export const StatusDetailDialog = ({
   selectedDay,
   selectedStatus,
   onClose,
-  language
 }: StatusDetailDialogProps) => {
-  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
+  const { currentLanguage, t } = useLanguage();
 
   return (
     <Dialog open={selectedDay !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-[90%] max-w-sm">
         <DialogHeader>
           <DialogTitle>
-            {selectedDay && format(selectedDay, "dd/MM/yyyy")} {getText("Status", "Trạng thái")}
+            {selectedDay && format(selectedDay, "dd/MM/yyyy")} {currentLanguage === "vi" ? "Trạng thái" : "Status"}
           </DialogTitle>
         </DialogHeader>
         
@@ -40,7 +39,7 @@ export const StatusDetailDialog = ({
           <div className="space-y-4 pt-2">
             <div className="flex items-center gap-2">
               {getStatusIcon(selectedStatus.status)}
-              <span className="font-medium">{getStatusText(selectedStatus.status, language)}</span>
+              <span className="font-medium">{getStatusText(selectedStatus.status, currentLanguage)}</span>
             </div>
             
             {(selectedStatus.checkIn || selectedStatus.checkOut) && (
@@ -48,7 +47,7 @@ export const StatusDetailDialog = ({
                 {selectedStatus.checkIn && (
                   <div>
                     <Label className="text-muted-foreground">
-                      {getText("Check-in", "Giờ vào")}
+                      {t('checkin')}
                     </Label>
                     <div className="font-medium">{selectedStatus.checkIn}</div>
                   </div>
@@ -56,7 +55,7 @@ export const StatusDetailDialog = ({
                 {selectedStatus.checkOut && (
                   <div>
                     <Label className="text-muted-foreground">
-                      {getText("Check-out", "Giờ ra")}
+                      {t('checkout')}
                     </Label>
                     <div className="font-medium">{selectedStatus.checkOut}</div>
                   </div>
@@ -67,7 +66,7 @@ export const StatusDetailDialog = ({
             {selectedStatus.reason && (
               <div>
                 <Label className="text-muted-foreground">
-                  {getText("Reason", "Lý do")}
+                  {t('reason')}
                 </Label>
                 <div className="font-medium">{selectedStatus.reason}</div>
               </div>
@@ -75,7 +74,7 @@ export const StatusDetailDialog = ({
             
             <div className="pt-2">
               <Button variant="outline" onClick={onClose} className="w-full">
-                {getText("Close", "Đóng")}
+                {t('close')}
               </Button>
             </div>
           </div>
