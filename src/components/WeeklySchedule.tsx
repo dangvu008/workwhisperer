@@ -49,7 +49,7 @@ export const WeeklySchedule = () => {
       };
     });
 
-    // Show toast notification - Fixed the translation key issue
+    // Show toast notification
     toast({
       title: currentLanguage === "vi" ? "Cập nhật trạng thái" : "Status Updated",
       description: currentLanguage === "vi" 
