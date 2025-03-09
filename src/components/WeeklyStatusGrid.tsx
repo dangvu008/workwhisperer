@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { DayStatus, DayDetails } from '../types';
 import { dateUtils } from '../utils/dateUtils';
+
 interface WeeklyStatusGridProps {
   week: DayDetails[];
   onStatusUpdate: (date: Date, status: DayStatus) => void;
@@ -42,7 +44,7 @@ export const WeeklyStatusGrid: React.FC<WeeklyStatusGridProps> = ({ week, onStat
         ))}
         
         {week.map((day, index) => {
-          const isToday = new Date().toDateString() === day.date.toDateString();
+          const isToday = dateUtils.isSameDay(new Date(), day.date);
           const isFuture = day.date > new Date();
           
           return (
@@ -50,6 +52,7 @@ export const WeeklyStatusGrid: React.FC<WeeklyStatusGridProps> = ({ week, onStat
               key={index}
               className={`relative p-4 border rounded cursor-pointer hover:bg-gray-100
                 ${isToday ? 'border-blue-500 border-2' : 'border-gray-200'}
+                ${dateUtils.isDateInCurrentWeek(day.date) ? 'bg-gray-50' : ''}
               `}
               onClick={() => !isFuture && handleDayClick(day)}
             >
