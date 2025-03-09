@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { WeeklyStatusGrid } from './WeeklyStatusGrid';
 import { WorkNotes } from './WorkNotes';
-import { AttendanceStatus, DayStatus } from '@/types/attendance';
-import { attendanceService, DayDetails, WorkNote } from '../services/attendanceService';
+import { AttendanceStatus } from '@/types/attendance';
+import { DayDetails, WorkNote } from '@/types/index';
+import { attendanceService } from '../services/attendanceService';
 
 export const Dashboard: React.FC = () => {
   const [weekData, setWeekData] = useState<DayDetails[]>([]);

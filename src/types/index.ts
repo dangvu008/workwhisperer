@@ -1,8 +1,9 @@
-export type DayStatus = '❗' | '✅' | '❓' | '📩' | '🛌' | '🎌' | '❌' | 'RV' | '--';
+
+import { AttendanceStatus } from './attendance';
 
 export interface DayDetails {
   date: Date;
-  status: DayStatus;
+  status: AttendanceStatus;
   checkIn?: string;
   checkOut?: string;
   reason?: string;
@@ -10,8 +11,7 @@ export interface DayDetails {
 
 export interface WorkNote {
   id: string;
-  title: string;
+  date: Date;
   content: string;
-  reminderTime: Date;
-  weekDays: number[]; // 1-7 representing Monday-Sunday
+  important: boolean;
 }

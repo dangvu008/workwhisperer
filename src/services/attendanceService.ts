@@ -1,20 +1,6 @@
 
-import { AttendanceStatus, DayStatus } from '@/types/attendance';
-
-export interface DayDetails {
-  date: Date;
-  status: AttendanceStatus;
-  checkIn?: string;
-  checkOut?: string;
-  reason?: string;
-}
-
-export interface WorkNote {
-  id: string;
-  date: Date;
-  content: string;
-  important: boolean;
-}
+import { AttendanceStatus } from '@/types/attendance';
+import { DayDetails, WorkNote } from '@/types/index';
 
 const STORAGE_KEY = 'attendance_data';
 
@@ -51,7 +37,7 @@ export const attendanceService = {
         date.setDate(monday.getDate() + index);
         return {
           date,
-          status: "pending", // Using a valid AttendanceStatus value
+          status: "pending" as AttendanceStatus,
         };
       });
 
