@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -14,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useLanguage } from "../contexts/LanguageContext";
 
 type ButtonState = "idle" | "go_work" | "check_in" | "check_out";
 type HistoryEntry = {
@@ -22,18 +24,15 @@ type HistoryEntry = {
   icon: JSX.Element;
 };
 
-interface ShiftStatusProps {
-  language?: string;
-}
-
-export const ShiftStatus = ({ language = "vi" }: ShiftStatusProps) => {
+export const ShiftStatus = () => {
   const [buttonState, setButtonState] = useState<ButtonState>("idle");
   const [workStartTime, setWorkStartTime] = useState<string | null>(null);
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const { currentLanguage, t } = useLanguage();
 
-  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
+  const getText = (en: string, vi: string) => currentLanguage === "vi" ? vi : en;
 
   const addToHistory = (action: string, icon: JSX.Element) => {
     const time = new Date().toLocaleTimeString();
