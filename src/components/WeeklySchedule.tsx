@@ -49,9 +49,9 @@ export const WeeklySchedule = () => {
       };
     });
 
-    // Show toast notification
+    // Show toast notification - Fix the translation key issue
     toast({
-      title: t('validation.required').replace('{field}', 'Status Updated'),
+      title: currentLanguage === "vi" ? "Cập nhật trạng thái" : "Status Updated",
       description: currentLanguage === "vi" 
         ? `Trạng thái đã đổi thành ${statusEmojis[newStatus].vi}`
         : `Day status changed to ${statusEmojis[newStatus].en}`,
@@ -83,7 +83,6 @@ export const WeeklySchedule = () => {
               key={i}
               date={date}
               dayStatus={dayStatus}
-              language={currentLanguage}
               onStatusChange={handleStatusChange}
               onCellClick={openDetailDialog}
             />
