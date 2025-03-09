@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DayStatus, DayDetails } from '../types';
-
+import { dateUtils } from '../utils/dateUtils';
 interface WeeklyStatusGridProps {
   week: DayDetails[];
   onStatusUpdate: (date: Date, status: DayStatus) => void;
