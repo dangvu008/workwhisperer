@@ -1,14 +1,12 @@
 
 import { format } from "date-fns";
-import { vi, enUS } from "date-fns/locale";
+import { vi as viLocale, enUS } from "date-fns/locale";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-interface TimeDisplayProps {
-  language?: string;
-}
-
-export const TimeDisplay = ({ language = "en" }: TimeDisplayProps) => {
+export const TimeDisplay = () => {
+  const { currentLanguage } = useLanguage();
   const now = new Date();
-  const locale = language === "vi" ? vi : enUS;
+  const locale = currentLanguage === "vi" ? viLocale : enUS;
   
   return (
     <div className="text-left mb-8 animate-fade-in">

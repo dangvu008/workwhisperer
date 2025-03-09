@@ -7,19 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Settings, BarChart2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { language, isDarkMode } = useSettings();
-
-  const getText = (en: string, vi: string) => language === "vi" ? vi : en;
+  const { isDarkMode } = useSettings();
+  const { t } = useLanguage();
   
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-b from-[#0A0F1C] to-[#1A1F2C] text-white' : 'bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] text-gray-800'}`}>
       <div className="max-w-md mx-auto p-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            {getText("Time Manager", "Quản lý thời gian")}
+            {t('dashboard_title')}
           </h1>
           <div className="flex gap-3">
             <Button 
@@ -41,10 +41,10 @@ const Index = () => {
         </div>
         
         <div className="space-y-6">
-          <TimeDisplay language={language} />
-          <ShiftStatus language={language} />
-          <WeeklySchedule language={language} />
-          <NoteSection language={language} />
+          <TimeDisplay />
+          <ShiftStatus />
+          <WeeklySchedule />
+          <NoteSection />
         </div>
       </div>
     </div>
