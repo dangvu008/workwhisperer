@@ -1,4 +1,6 @@
-import { DayDetails, DayStatus } from '../types';
+
+import { DayDetails } from '../types';
+import { AttendanceStatus } from '@/types/attendance';
 
 const STORAGE_KEY = 'attendance_data';
 
@@ -35,7 +37,7 @@ export const attendanceService = {
         date.setDate(monday.getDate() + index);
         return {
           date,
-          status: '❓' as DayStatus,
+          status: "pending" as AttendanceStatus,
         };
       });
 
@@ -44,7 +46,7 @@ export const attendanceService = {
   },
 
   // Cập nhật trạng thái cho một ngày
-  updateDayStatus(date: Date, status: DayStatus): DayDetails[] {
+  updateDayStatus(date: Date, status: AttendanceStatus): DayDetails[] {
     const weekData = this.getWeekData();
     const updatedData = weekData.map(day => 
       day.date.toDateString() === date.toDateString()

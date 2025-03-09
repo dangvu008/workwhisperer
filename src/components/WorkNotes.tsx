@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { WorkNote } from '../types';
 
@@ -21,6 +22,8 @@ export const WorkNotes: React.FC<WorkNotesProps> = ({
     content: '',
     reminderTime: '',
     weekDays: [] as number[],
+    important: false,
+    date: new Date(),
   });
 
   const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -38,6 +41,7 @@ export const WorkNotes: React.FC<WorkNotesProps> = ({
       onAddNote({
         ...formData,
         reminderTime: new Date(formData.reminderTime),
+        date: new Date(),
       });
     }
     
@@ -50,6 +54,8 @@ export const WorkNotes: React.FC<WorkNotesProps> = ({
       content: '',
       reminderTime: '',
       weekDays: [],
+      important: false,
+      date: new Date(),
     });
     setIsAddingNote(false);
     setEditingNote(null);
@@ -88,6 +94,8 @@ export const WorkNotes: React.FC<WorkNotesProps> = ({
                       content: note.content,
                       reminderTime: note.reminderTime.toISOString().slice(0, 16),
                       weekDays: note.weekDays,
+                      important: note.important,
+                      date: note.date,
                     });
                   }}
                 >
@@ -179,6 +187,19 @@ export const WorkNotes: React.FC<WorkNotesProps> = ({
                     </label>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.important}
+                    onChange={(e) =>
+                      setFormData({ ...formData, important: e.target.checked })
+                    }
+                  />
+                  <span className="ml-1">Đánh dấu là quan trọng</span>
+                </label>
               </div>
             </div>
 

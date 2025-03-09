@@ -14,4 +14,7 @@ export interface WorkNote {
   date: Date;
   content: string;
   important: boolean;
+  title: string;
+  reminderTime: Date;
+  weekDays: number[]; // 1-7 representing Monday-Sunday
 }

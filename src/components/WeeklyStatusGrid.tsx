@@ -1,23 +1,23 @@
 
 import React, { useState } from 'react';
-import { DayStatus, DayDetails } from '../types';
+import { DayDetails } from '../types';
+import { AttendanceStatus } from '@/types/attendance';
 import { dateUtils } from '../utils/dateUtils';
 
 interface WeeklyStatusGridProps {
   week: DayDetails[];
-  onStatusUpdate: (date: Date, status: DayStatus) => void;
+  onStatusUpdate: (date: Date, status: AttendanceStatus) => void;
 }
 
-const statusOptions: { status: DayStatus; label: string; color: string }[] = [
-  { status: '❗', label: 'Thiếu chấm công', color: '#ff9800' },
-  { status: '✅', label: 'Đủ công', color: '#4caf50' },
-  { status: '❓', label: 'Chưa cập nhật', color: '#9e9e9e' },
-  { status: '📩', label: 'Nghỉ phép', color: '#2196f3' },
-  { status: '🛌', label: 'Nghỉ bệnh', color: '#f44336' },
-  { status: '🎌', label: 'Nghỉ lễ', color: '#9c27b0' },
-  { status: '❌', label: 'Vắng không lý do', color: '#d32f2f' },
-  { status: 'RV', label: 'Vào muộn/ra sớm', color: '#ff5722' },
-  { status: '--', label: 'Chưa đến', color: '#9e9e9e' },
+const statusOptions: { status: AttendanceStatus; label: string; color: string }[] = [
+  { status: 'warning', label: 'Thiếu chấm công', color: '#ff9800' },
+  { status: 'complete', label: 'Đủ công', color: '#4caf50' },
+  { status: 'pending', label: 'Chưa cập nhật', color: '#9e9e9e' },
+  { status: 'leave', label: 'Nghỉ phép', color: '#2196f3' },
+  { status: 'sick', label: 'Nghỉ bệnh', color: '#f44336' },
+  { status: 'holiday', label: 'Nghỉ lễ', color: '#9c27b0' },
+  { status: 'absent', label: 'Vắng không lý do', color: '#d32f2f' },
+  { status: 'late', label: 'Vào muộn/ra sớm', color: '#ff5722' },
 ];
 
 const weekDayShort = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
@@ -29,7 +29,7 @@ export const WeeklyStatusGrid: React.FC<WeeklyStatusGridProps> = ({ week, onStat
     setSelectedDay(day);
   };
 
-  const handleStatusChange = (day: DayDetails, newStatus: DayStatus) => {
+  const handleStatusChange = (day: DayDetails, newStatus: AttendanceStatus) => {
     onStatusUpdate(day.date, newStatus);
     setSelectedDay(null);
   };
@@ -58,7 +58,7 @@ export const WeeklyStatusGrid: React.FC<WeeklyStatusGridProps> = ({ week, onStat
             >
               <div className="text-sm">{day.date.getDate()}</div>
               <div className="text-xl">
-                {isFuture ? '--' : day.status}
+                {isFuture ? 'pending' : day.status}
               </div>
             </div>
           );
