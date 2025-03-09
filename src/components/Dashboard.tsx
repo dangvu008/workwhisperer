@@ -20,9 +20,27 @@ export const Dashboard: React.FC = () => {
     }
   }, []);
 
-  const handleStatusUpdate = (date: Date, status: DayStatus) => {
+  const handleStatusUpdate = (date: Date, status: AttendanceStatus) => {
     const updatedData = attendanceService.updateDayStatus(date, status);
     setWeekData(updatedData);
+  };
+
+  const handleAddNote = (note: Omit<WorkNote, 'id'>) => {
+    const newNote: WorkNote = {
+      ...note,
+      id: crypto.randomUUID(),
+    };
+    setNotes([...notes, newNote]);
+  };
+
+  const handleEditNote = (updatedNote: WorkNote) => {
+    setNotes(notes.map(note => 
+      note.id === updatedNote.id ? updatedNote : note
+    ));
+  };
+
+  const handleDeleteNote = (id: string) => {
+    setNotes(notes.filter(note => note.id !== id));
   };
 
   return (
@@ -30,10 +48,18 @@ export const Dashboard: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">Attendance Dashboard</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <WeeklyStatusGrid />
+          <WeeklyStatusGrid 
+            week={weekData} 
+            onStatusUpdate={handleStatusUpdate} 
+          />
         </div>
         <div>
-          <WorkNotes />
+          <WorkNotes 
+            notes={notes}
+            onAddNote={handleAddNote}
+            onEditNote={handleEditNote}
+            onDeleteNote={handleDeleteNote}
+          />
         </div>
       </div>
     </div>

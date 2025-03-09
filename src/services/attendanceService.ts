@@ -1,9 +1,9 @@
 
-import { DayStatus } from '@/types/attendance';
+import { AttendanceStatus, DayStatus } from '@/types/attendance';
 
 export interface DayDetails {
   date: Date;
-  status: DayStatus;
+  status: AttendanceStatus;
   checkIn?: string;
   checkOut?: string;
   reason?: string;
@@ -51,7 +51,7 @@ export const attendanceService = {
         date.setDate(monday.getDate() + index);
         return {
           date,
-          status: 'pending',
+          status: "pending", // Using a valid AttendanceStatus value
         };
       });
 
@@ -60,7 +60,7 @@ export const attendanceService = {
   },
 
   // Update status for a day
-  updateDayStatus(date: Date, status: DayStatus): DayDetails[] {
+  updateDayStatus(date: Date, status: AttendanceStatus): DayDetails[] {
     const weekData = this.getWeekData();
     const updatedData = weekData.map(day => 
       day.date.toDateString() === date.toDateString()
