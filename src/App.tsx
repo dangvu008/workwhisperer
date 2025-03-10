@@ -10,6 +10,12 @@ import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
+import React from 'react';
+import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { lightTheme, darkTheme } from './styles/theme';
+import { GlobalStyles } from './styles/GlobalStyles';
+import { useTheme } from './context/ThemeContext';
 
 const queryClient = new QueryClient();
 
@@ -47,5 +53,25 @@ function App() {
     </QueryClientProvider>
   );
 }
+// Wrapper component to handle theme selection
+const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { theme } = useTheme();
+  return (
+    <StyledThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+      <GlobalStyles />
+      {children}
+    </StyledThemeProvider>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <ThemeWrapper>
+        {/* Your existing router and components */}
+      </ThemeWrapper>
+    </ThemeProvider>
+  );
+};
 
 export default App;
