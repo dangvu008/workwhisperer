@@ -13,6 +13,7 @@ import { GlobalStyles } from './types/GlobalStyles';
 import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import { useTheme } from './context/ThemeContext';
 
 const queryClient = new QueryClient();
 
@@ -21,14 +22,11 @@ const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
   const { themeObject } = useTheme();
   return (
     <StyledThemeProvider theme={themeObject}>
-      <GlobalStyles />
+      <GlobalStyles theme={themeObject} />
       {children}
     </StyledThemeProvider>
   );
 };
-
-// Import useTheme after defining ThemeWrapper to avoid circular dependency
-import { useTheme } from './context/ThemeContext';
 
 const App: React.FC = () => {
   return (
