@@ -7,6 +7,7 @@ import { WorkShiftForm } from "@/components/WorkShiftForm";
 import { WorkShiftList } from "@/components/settings/WorkShiftList";
 import { GeneralSettings } from "@/components/settings/GeneralSettings";
 import { useSettings } from "@/contexts/SettingsContext";
+import React from 'react';
 import { 
   Container, 
   Card, 
@@ -14,7 +15,7 @@ import {
   Title, 
   Text 
 } from './common/CommonComponents';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface WorkShift {
   id: string;
@@ -51,8 +52,21 @@ const Settings = () => {
       isActive: true,
     }
   ]);
+  const Settings: React.FC = () => {
+    const { theme, toggleTheme } = useTheme();
   
-  const { theme, toggleTheme } = useTheme();
+    return (
+      <Container>
+        <Card>
+          <Title>Settings</Title>
+          <Text>Current theme: {theme}</Text>
+          <Button onClick={toggleTheme}>
+            Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
+          </Button>
+        </Card>
+      </Container>
+    );
+  };
   
   const handleDarkModeToggle = (enabled: boolean) => {
     setDarkMode(enabled);
