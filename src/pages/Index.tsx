@@ -1,9 +1,8 @@
-
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Giả định sử dụng react-router-dom
 import { Settings, BarChart2 } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import styled from 'styled-components';
 import {
   Container,
@@ -67,8 +66,7 @@ const NavigationLink = styled.a`
 
 const Index: React.FC = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
+  const { isDarkMode } = useSettings();
   const { t } = useLanguage();
 
   const formatDateTime = (date: Date) => {
