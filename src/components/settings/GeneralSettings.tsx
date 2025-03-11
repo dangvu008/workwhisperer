@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSettings } from "@/contexts/SettingsContext";
 
 interface GeneralSettingsProps {
   language: string;
