@@ -11,48 +11,14 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import React from 'react';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
-import { lightTheme, darkTheme } from './styles/theme';
-import { GlobalStyles } from './styles/GlobalStyles';
-import { useTheme } from './context/ThemeContext';
+import { lightTheme, darkTheme } from './types/theme';
+import { GlobalStyles } from './types/GlobalStyles';
+import { useTheme } from './contexts/ThemeContext';
 
 const queryClient = new QueryClient();
 
-function App() {
-  // Check initial dark mode from localStorage on app load
-  useEffect(() => {
-    const isDarkMode = localStorage.getItem("darkMode") === "true";
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SettingsProvider>
-          <LanguageProvider>
-            <div className="min-h-screen transition-colors duration-300">
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/settings" element={<Settings />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </div>
-          </LanguageProvider>
-        </SettingsProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-}
 // Wrapper component to handle theme selection
 const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme } = useTheme();
@@ -65,10 +31,39 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 };
 
 const App: React.FC = () => {
+  // Check initial dark mode from localStorage on app load
+  useEffect(() => {
+    const isDarkMode = localStorage.getItem("darkMode") === "true";
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <ThemeWrapper>
-        {/* Your existing router and components */}
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <SettingsProvider>
+              <LanguageProvider>
+                <div className="min-h-screen transition-colors duration-300">
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/settings" element={<Settings />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </BrowserRouter>
+                </div>
+              </LanguageProvider>
+            </SettingsProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
       </ThemeWrapper>
     </ThemeProvider>
   );
