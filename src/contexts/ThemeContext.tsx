@@ -1,76 +1,43 @@
-import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 20px;
-  background-color: ${({ theme }) => theme.background};
-  min-height: 100vh;
-`;
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export const Card = styled.div`
-  background-color: ${({ theme }) => theme.cardBackground};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-`;
+interface ThemeContextType {
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+}
 
-export const Button = styled.button`
-  background-color: ${({ theme }) => theme.primary};
-  color: #FFFFFF;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: opacity 0.3s ease;
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'light',
+  toggleTheme: () => {}
+});
 
-  &:hover {
-    opacity: 0.9;
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) 
+      ? 'dark' 
+      : 'light';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
-`;
-
-export const Input = styled.input`
-  background-color: ${({ theme }) => theme.cardBackground};
-  color: ${({ theme }) => theme.text};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 4px;
-  padding: 8px;
-  width: 100%;
-
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.primary};
-  }
-`;
-
-export const Title = styled.h1`
-  color: ${({ theme }) => theme.text};
-  margin-bottom: 20px;
-`;
-
-export const SubTitle = styled.h2`
-  color: ${({ theme }) => theme.text};
-  margin-bottom: 16px;
-`;
-
-export const Text = styled.p`
-  color: ${({ theme }) => theme.text};
-  line-height: 1.6;
-`;
-
-export const Divider = styled.hr`
-  border: none;
-  border-top: 1px solid ${({ theme }) => theme.divider};
-  margin: 20px 0;
-`;
-
-export const FlexContainer = styled.div`
-  display: flex;
-  gap: 16px;
-`;
-
-export const Label = styled.label`
-  color: ${({ theme }) => theme.textSecondary};
-  display: block;
-  margin-bottom: 8px;
-`;
+  return context;
+};
