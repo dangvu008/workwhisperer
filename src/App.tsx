@@ -19,7 +19,18 @@ import { useTheme } from './context/ThemeContext';
 
 const queryClient = new QueryClient();
 
-function App() {
+// Wrapper component to handle theme selection
+const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { theme } = useTheme();
+  return (
+    <StyledThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+      <GlobalStyles theme={theme === 'light' ? lightTheme : darkTheme} />
+      {children}
+    </StyledThemeProvider>
+  );
+};
+
+const App: React.FC = () => {
   // Check initial dark mode from localStorage on app load
   useEffect(() => {
     const isDarkMode = localStorage.getItem("darkMode") === "true";
@@ -31,44 +42,28 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SettingsProvider>
-          <LanguageProvider>
-            <div className="min-h-screen transition-colors duration-300">
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/settings" element={<Settings />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </div>
-          </LanguageProvider>
-        </SettingsProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-}
-// Wrapper component to handle theme selection
-const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { theme } = useTheme();
-  return (
-    <StyledThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <GlobalStyles />
-      {children}
-    </StyledThemeProvider>
-  );
-};
-
-const App: React.FC = () => {
-  return (
     <ThemeProvider>
       <ThemeWrapper>
-        {/* Your existing router and components */}
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <SettingsProvider>
+              <LanguageProvider>
+                <div className="min-h-screen transition-colors duration-300">
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/settings" element={<Settings />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </BrowserRouter>
+                </div>
+              </LanguageProvider>
+            </SettingsProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
       </ThemeWrapper>
     </ThemeProvider>
   );
