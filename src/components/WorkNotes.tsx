@@ -33,7 +33,7 @@ const noteSchema = z.object({
     .min(1, { message: "Nội dung không được để trống" })
     .max(300, { message: "Nội dung không được quá 300 ký tự" }),
   reminderTime: z.string().min(1, { message: "Thời gian nhắc nhở không được để trống" }),
-  weekDays: z.array(z.number()).optional(),
+  weekDays: z.array(z.number()).default([]),
   important: z.boolean().default(false),
 });
 
@@ -100,9 +100,13 @@ export const WorkNotes: React.FC<WorkNotesProps> = ({
       });
       toast.success(currentLanguage === 'vi' ? "Đã cập nhật ghi chú" : "Note updated");
     } else {
+      // Ensure all required fields are provided when adding a new note
       onAddNote({
-        ...data,
+        title: data.title,
+        content: data.content,
         reminderTime: new Date(data.reminderTime),
+        weekDays: data.weekDays || [],
+        important: data.important,
         date: new Date(),
       });
       toast.success(currentLanguage === 'vi' ? "Đã thêm ghi chú mới" : "New note added");

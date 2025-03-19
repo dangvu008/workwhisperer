@@ -26,7 +26,7 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   
   return (
     <StyledThemeProvider theme={currentTheme}>
-      <GlobalStyles />
+      <GlobalStyles theme={currentTheme} />
       {children}
     </StyledThemeProvider>
   );
