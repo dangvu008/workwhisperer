@@ -22,8 +22,10 @@ const queryClient = new QueryClient();
 // Wrapper component to handle theme selection
 const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme } = useTheme();
+  const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+  
   return (
-    <StyledThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+    <StyledThemeProvider theme={currentTheme}>
       <GlobalStyles />
       {children}
     </StyledThemeProvider>

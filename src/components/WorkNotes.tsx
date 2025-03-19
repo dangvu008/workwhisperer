@@ -1,6 +1,21 @@
 
 import React, { useState } from 'react';
 import { WorkNote } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Pen, Trash2 } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface WorkNotesProps {
   notes: WorkNote[];
@@ -9,218 +24,330 @@ interface WorkNotesProps {
   onDeleteNote: (id: string) => void;
 }
 
+// Schema for form validation
+const noteSchema = z.object({
+  title: z.string()
+    .min(1, { message: "Tiêu đề không được để trống" })
+    .max(100, { message: "Tiêu đề không được quá 100 ký tự" }),
+  content: z.string()
+    .min(1, { message: "Nội dung không được để trống" })
+    .max(300, { message: "Nội dung không được quá 300 ký tự" }),
+  reminderTime: z.string().min(1, { message: "Thời gian nhắc nhở không được để trống" }),
+  weekDays: z.array(z.number()).optional(),
+  important: z.boolean().default(false),
+});
+
+type NoteFormValues = z.infer<typeof noteSchema>;
+
 export const WorkNotes: React.FC<WorkNotesProps> = ({
   notes,
   onAddNote,
   onEditNote,
   onDeleteNote,
 }) => {
-  const [isAddingNote, setIsAddingNote] = useState(false);
+  const { currentLanguage, t } = useLanguage();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<WorkNote | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    content: '',
-    reminderTime: '',
-    weekDays: [] as number[],
-    important: false,
-    date: new Date(),
+  
+  // Initialize form with react-hook-form
+  const form = useForm<NoteFormValues>({
+    resolver: zodResolver(noteSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      reminderTime: "",
+      weekDays: [],
+      important: false,
+    },
   });
+  
+  // Weekday options
+  const weekDays = currentLanguage === 'vi' 
+    ? ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'] 
+    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  const handleOpenDialog = (note?: WorkNote) => {
+    if (note) {
+      setEditingNote(note);
+      form.reset({
+        title: note.title,
+        content: note.content,
+        reminderTime: note.reminderTime instanceof Date 
+          ? note.reminderTime.toISOString().slice(0, 16) 
+          : typeof note.reminderTime === 'string' ? note.reminderTime : '',
+        weekDays: note.weekDays || [],
+        important: note.important,
+      });
+    } else {
+      setEditingNote(null);
+      form.reset({
+        title: "",
+        content: "",
+        reminderTime: "",
+        weekDays: [],
+        important: false,
+      });
+    }
+    setIsDialogOpen(true);
+  };
 
-  const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const onSubmit = (data: NoteFormValues) => {
     if (editingNote) {
       onEditNote({
         ...editingNote,
-        ...formData,
-        reminderTime: new Date(formData.reminderTime),
+        ...data,
+        reminderTime: new Date(data.reminderTime),
       });
+      toast.success(currentLanguage === 'vi' ? "Đã cập nhật ghi chú" : "Note updated");
     } else {
       onAddNote({
-        ...formData,
-        reminderTime: new Date(formData.reminderTime),
+        ...data,
+        reminderTime: new Date(data.reminderTime),
         date: new Date(),
       });
+      toast.success(currentLanguage === 'vi' ? "Đã thêm ghi chú mới" : "New note added");
     }
-    
-    resetForm();
+    setIsDialogOpen(false);
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      content: '',
-      reminderTime: '',
-      weekDays: [],
-      important: false,
-      date: new Date(),
-    });
-    setIsAddingNote(false);
-    setEditingNote(null);
-  };
-
-  const handleDelete = (note: WorkNote) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa ghi chú này?')) {
-      onDeleteNote(note.id);
-    }
-  };
+  // Sort notes by reminder time, most recent first
+  const sortedNotes = [...notes].sort((a, b) => {
+    const dateA = a.reminderTime instanceof Date ? a.reminderTime : new Date(a.reminderTime);
+    const dateB = b.reminderTime instanceof Date ? b.reminderTime : new Date(b.reminderTime);
+    return dateA.getTime() - dateB.getTime();
+  }).slice(0, 3); // Show only the 3 most recent notes
 
   return (
-    <div className="work-notes">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Ghi Chú Công Việc</h2>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={() => setIsAddingNote(true)}
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">
+          {currentLanguage === 'vi' ? 'Ghi Chú Công Việc' : 'Work Notes'}
+        </h2>
+        <Button 
+          onClick={() => handleOpenDialog()}
+          className="flex items-center gap-2"
         >
-          Thêm Ghi Chú
-        </button>
+          <span>+</span>
+          <span className="text-sm">
+            {currentLanguage === 'vi' ? 'Thêm Ghi Chú' : 'Add Note'}
+          </span>
+        </Button>
       </div>
 
-      <div className="space-y-4">
-        {notes.slice(0, 3).map((note) => (
-          <div key={note.id} className="border p-4 rounded">
-            <div className="flex justify-between">
-              <h3 className="font-bold">{note.title}</h3>
-              <div>
-                <button
-                  className="mr-2"
-                  onClick={() => {
-                    setEditingNote(note);
-                    setFormData({
-                      title: note.title,
-                      content: note.content,
-                      reminderTime: note.reminderTime.toISOString().slice(0, 16),
-                      weekDays: note.weekDays,
-                      important: note.important,
-                      date: note.date,
-                    });
-                  }}
-                >
-                  ✏️
-                </button>
-                <button onClick={() => handleDelete(note)}>🗑️</button>
+      {sortedNotes.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          {currentLanguage === 'vi' ? 'Chưa có ghi chú nào' : 'No notes yet'}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {sortedNotes.map((note) => (
+            <Card key={note.id} className="p-3">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1 flex-1">
+                  <h3 className="font-medium truncate pr-4">{note.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {note.content}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {currentLanguage === 'vi' ? 'Nhắc nhở: ' : 'Reminder: '}
+                    {note.reminderTime instanceof Date 
+                      ? note.reminderTime.toLocaleString()
+                      : new Date(note.reminderTime).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => handleOpenDialog(note)}
+                  >
+                    <Pen className="w-4 h-4" />
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {currentLanguage === 'vi' ? 'Xác nhận xóa' : 'Confirm Deletion'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {currentLanguage === 'vi' 
+                            ? 'Bạn có chắc chắn muốn xóa ghi chú này? Hành động này không thể hoàn tác.'
+                            : 'Are you sure you want to delete this note? This action cannot be undone.'}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>
+                          {currentLanguage === 'vi' ? 'Hủy' : 'Cancel'}
+                        </AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => {
+                            onDeleteNote(note.id);
+                            toast.success(currentLanguage === 'vi' ? "Đã xóa ghi chú" : "Note deleted");
+                          }}
+                        >
+                          {currentLanguage === 'vi' ? 'Xác nhận' : 'Confirm'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
-            </div>
-            <p className="text-gray-600">{note.content}</p>
-            <p className="text-sm text-gray-500">
-              Nhắc nhở: {note.reminderTime.toLocaleString()}
-            </p>
-          </div>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
-      {(isAddingNote || editingNote) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded-lg max-w-md w-full"
-          >
-            <h3 className="text-lg font-bold mb-4">
-              {editingNote ? 'Sửa Ghi Chú' : 'Thêm Ghi Chú'}
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block mb-1">
-                  Tiêu đề ({formData.title.length}/100)
-                </label>
-                <input
-                  type="text"
-                  maxLength={100}
-                  required
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">
-                  Nội dung ({formData.content.length}/300)
-                </label>
-                <textarea
-                  maxLength={300}
-                  required
-                  value={formData.content}
-                  onChange={(e) =>
-                    setFormData({ ...formData, content: e.target.value })
-                  }
-                  className="w-full border p-2 rounded"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">Thời gian nhắc nhở</label>
-                <input
-                  type="datetime-local"
-                  required
-                  value={formData.reminderTime}
-                  onChange={(e) =>
-                    setFormData({ ...formData, reminderTime: e.target.value })
-                  }
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">Ngày trong tuần</label>
-                <div className="flex gap-2">
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingNote 
+                ? currentLanguage === 'vi' ? 'Sửa Ghi Chú' : 'Edit Note'
+                : currentLanguage === 'vi' ? 'Thêm Ghi Chú Mới' : 'Add New Note'
+              }
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {currentLanguage === 'vi' ? 'Tiêu đề' : 'Title'} 
+                      <span className="text-xs ml-2 text-muted-foreground">
+                        ({field.value.length}/100)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder={currentLanguage === 'vi' ? 'Nhập tiêu đề...' : 'Enter title...'}
+                        maxLength={100}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {currentLanguage === 'vi' ? 'Nội dung' : 'Content'}
+                      <span className="text-xs ml-2 text-muted-foreground">
+                        ({field.value.length}/300)
+                      </span>
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder={currentLanguage === 'vi' ? 'Nhập nội dung...' : 'Enter content...'}
+                        className="min-h-[100px]"
+                        maxLength={300}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="reminderTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {currentLanguage === 'vi' ? 'Thời gian nhắc nhở' : 'Reminder Time'}
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="datetime-local" 
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="space-y-2">
+                <Label>
+                  {currentLanguage === 'vi' ? 'Ngày trong tuần' : 'Weekdays'}
+                </Label>
+                <div className="flex flex-wrap gap-3">
                   {weekDays.map((day, index) => (
-                    <label key={day} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.weekDays.includes(index + 1)}
-                        onChange={(e) => {
-                          const newWeekDays = e.target.checked
-                            ? [...formData.weekDays, index + 1]
-                            : formData.weekDays.filter((d) => d !== index + 1);
-                          setFormData({ ...formData, weekDays: newWeekDays });
+                    <div key={index} className="flex items-center gap-1.5">
+                      <Checkbox 
+                        id={`weekday-${index}`}
+                        checked={(form.watch('weekDays') || []).includes(index + 1)}
+                        onCheckedChange={(checked) => {
+                          const currentWeekDays = form.watch('weekDays') || [];
+                          if (checked) {
+                            form.setValue('weekDays', [...currentWeekDays, index + 1]);
+                          } else {
+                            form.setValue('weekDays', currentWeekDays.filter(d => d !== index + 1));
+                          }
                         }}
                       />
-                      <span className="ml-1">{day}</span>
-                    </label>
+                      <label 
+                        htmlFor={`weekday-${index}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {day}
+                      </label>
+                    </div>
                   ))}
                 </div>
               </div>
-
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.important}
-                    onChange={(e) =>
-                      setFormData({ ...formData, important: e.target.checked })
-                    }
-                  />
-                  <span className="ml-1">Đánh dấu là quan trọng</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex gap-2 mt-4">
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                {editingNote ? 'Lưu' : 'Thêm'}
-              </button>
-              <button
-                type="button"
-                onClick={resetForm}
-                className="bg-gray-200 px-4 py-2 rounded"
-              >
-                Hủy
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+              
+              <FormField
+                control={form.control}
+                name="important"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormControl>
+                      <Checkbox 
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="cursor-pointer">
+                      {currentLanguage === 'vi' ? 'Đánh dấu là quan trọng' : 'Mark as important'}
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter className="mt-6">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  {currentLanguage === 'vi' ? 'Hủy' : 'Cancel'}
+                </Button>
+                <Button type="submit">
+                  {editingNote 
+                    ? currentLanguage === 'vi' ? 'Lưu' : 'Save'
+                    : currentLanguage === 'vi' ? 'Thêm' : 'Add'
+                  }
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
