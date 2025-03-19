@@ -24,7 +24,7 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const { theme } = useTheme();
   return (
     <StyledThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <GlobalStyles theme={theme === 'light' ? lightTheme : darkTheme} />
+      <GlobalStyles />
       {children}
     </StyledThemeProvider>
   );
