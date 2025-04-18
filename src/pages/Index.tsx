@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Giả định sử dụng react-router-dom
+import { useNavigate } from 'react-router-dom';
 import { Settings, BarChart2 } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -11,7 +12,7 @@ import {
   Text,
   FlexContainer,
   Label,
-} from './common/CommonComponents';
+} from '../components/common/CommonComponents';
 
 // Styled Components
 const StyledTimeDisplay = styled(Text)`

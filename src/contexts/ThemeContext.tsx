@@ -1,76 +1,41 @@
-import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 20px;
-  background-color: ${({ theme }) => theme.background};
-  min-height: 100vh;
-`;
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export const Card = styled.div`
-  background-color: ${({ theme }) => theme.cardBackground};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-`;
+type ThemeContextType = {
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+};
 
-export const Button = styled.button`
-  background-color: ${({ theme }) => theme.primary};
-  color: #FFFFFF;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: opacity 0.3s ease;
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'light',
+  toggleTheme: () => {},
+});
 
-  &:hover {
-    opacity: 0.9;
-  }
-`;
+export const useTheme = () => useContext(ThemeContext);
 
-export const Input = styled.input`
-  background-color: ${({ theme }) => theme.cardBackground};
-  color: ${({ theme }) => theme.text};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 4px;
-  padding: 8px;
-  width: 100%;
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.primary};
-  }
-`;
+  useEffect(() => {
+    // Check if user has a saved preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      setTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // If no saved preference, check system preference
+      setTheme('dark');
+    }
+  }, []);
 
-export const Title = styled.h1`
-  color: ${({ theme }) => theme.text};
-  margin-bottom: 20px;
-`;
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
 
-export const SubTitle = styled.h2`
-  color: ${({ theme }) => theme.text};
-  margin-bottom: 16px;
-`;
-
-export const Text = styled.p`
-  color: ${({ theme }) => theme.text};
-  line-height: 1.6;
-`;
-
-export const Divider = styled.hr`
-  border: none;
-  border-top: 1px solid ${({ theme }) => theme.divider};
-  margin: 20px 0;
-`;
-
-export const FlexContainer = styled.div`
-  display: flex;
-  gap: 16px;
-`;
-
-export const Label = styled.label`
-  color: ${({ theme }) => theme.textSecondary};
-  display: block;
-  margin-bottom: 8px;
-`;
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};

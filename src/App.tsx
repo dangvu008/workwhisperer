@@ -11,11 +11,11 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import React from 'react';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from './styles/theme';
 import { GlobalStyles } from './styles/GlobalStyles';
-import { useTheme } from './context/ThemeContext';
+import { useTheme } from './contexts/ThemeContext';
 
 const queryClient = new QueryClient();
 

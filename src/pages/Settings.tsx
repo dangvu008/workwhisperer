@@ -7,15 +7,14 @@ import { WorkShiftForm } from "@/components/WorkShiftForm";
 import { WorkShiftList } from "@/components/settings/WorkShiftList";
 import { GeneralSettings } from "@/components/settings/GeneralSettings";
 import { useSettings } from "@/contexts/SettingsContext";
-import React from 'react';
 import { 
   Container, 
   Card, 
   Button, 
   Title, 
   Text 
-} from './common/CommonComponents';
-import { useTheme } from '../context/ThemeContext';
+} from '../components/common/CommonComponents';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface WorkShift {
   id: string;
@@ -41,6 +40,7 @@ const Settings = () => {
     setVibrationEnabled
   } = useSettings();
   
+  const { theme, toggleTheme } = useTheme();
   const [showWorkShiftForm, setShowWorkShiftForm] = React.useState(false);
   const [editingShift, setEditingShift] = React.useState<WorkShift | null>(null);
   const [workShifts, setWorkShifts] = React.useState<WorkShift[]>([
@@ -52,21 +52,6 @@ const Settings = () => {
       isActive: true,
     }
   ]);
-  const Settings: React.FC = () => {
-    const { theme, toggleTheme } = useTheme();
-  
-    return (
-      <Container>
-        <Card>
-          <Title>Settings</Title>
-          <Text>Current theme: {theme}</Text>
-          <Button onClick={toggleTheme}>
-            Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
-          </Button>
-        </Card>
-      </Container>
-    );
-  };
   
   const handleDarkModeToggle = (enabled: boolean) => {
     setDarkMode(enabled);
@@ -126,6 +111,15 @@ const Settings = () => {
             <ArrowLeft className="h-6 w-6" />
           </Link>
         </div>
+
+        {/* Theme Settings */}
+        <Card className="mb-6">
+          <Title className="text-xl">Theme Settings</Title>
+          <Text>Current theme: {theme}</Text>
+          <Button onClick={toggleTheme} className="mt-2">
+            Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
+          </Button>
+        </Card>
 
         {/* Work Shifts Section */}
         <WorkShiftList
